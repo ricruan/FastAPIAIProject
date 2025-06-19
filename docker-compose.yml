@@ -1,0 +1,39 @@
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: ../Dockerfile
+    container_name: stone_ai_fastapi
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../:/app
+    environment:
+      - DATABASE_URL=stone_ai_db:root@localhost:3306/stone_ai_db?charset=utf8mb4
+    depends_on:
+      - db
+    networks:
+      - fastapi_network
+
+#  db:
+#    image: mysql:8.0
+#    container_name: ai_mysql
+#    restart: always
+#    ports:
+#      - "3306:3306"  # 默认MySQL端口
+#    environment:
+#      MYSQL_ROOT_PASSWORD: root  # 设置MySQL root密码
+#      MYSQL_DATABASE: stone_ai_db  # 设置初始数据库名称
+#    volumes:
+#      - mysql_data:/var/lib/mysql  # 数据卷映射
+#    networks:
+#      - fastapi_network
+
+networks:
+  fastapi_network:
+    driver: bridge
+
+#volumes:
+#  mysql_data:
