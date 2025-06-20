@@ -6,7 +6,7 @@ from src.pojo.po.apiInfoPo import APIInfo
 from src.dao.apiInfoDao import get_info_by_api_code,get_info_by_type_code, create_api_info, search_api_info # 获取数据库会话
 from src.pojo.vo.apiInfoVo import APIInfoCreate
 from src.myHttp.bo.httpResponse import HttpResponse, HttpResponseModel
-from src.service.apiInfoService import get_api_info_4_task_classify
+from src.service.apiInfoService import get_api_info_4_task_classify, api_info_2_struct_str
 
 router = APIRouter(prefix="/api/info", tags=["API Info"])
 
@@ -19,6 +19,7 @@ async def get_api_info_by_api_code(api_code: str, db: Session = Depends(get_db))
     :return:  查询结果
     """
     api_info = get_info_by_api_code(db, api_code)
+    api_info = api_info_2_struct_str(api_info)
     return HttpResponse.success(api_info)
 
 @router.get("/type/{type_code}", response_model=HttpResponseModel[List[Dict[str, Any]]])
@@ -60,7 +61,7 @@ async def create_api_info_endpoint(api_info_data: APIInfoCreate, db: Session = D
         return HttpResponse.error(msg=str(e))
 
 @router.post("/search", response_model=HttpResponseModel[List[APIInfo]])
-async def search_api_info_endpoint(search_params: Dict[str, Any], db: Session = Depends(get_db)) -> HttpResponseModel[List[APIInfo]]:
+async def search_api_info_endpoint(search_params: Dict[str, Any] | None, db: Session = Depends(get_db)) -> HttpResponseModel[List[APIInfo]]:
     """
     根据提供的参数搜索API信息
     

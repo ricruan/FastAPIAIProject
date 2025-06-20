@@ -5,44 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="db70534d-715e-4cc5-a79f-85ef3738f13c" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/CopilotChatHistory.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/CopilotSideBarWebPersist.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/CopilotWebChatHistory.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/FastAPIProject.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/project.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/controller/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/controller/apiInfoController.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/dao/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/dao/apiInfoDao.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/db/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/db/db.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/db/ddl/ddl.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/env/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/myHttp/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/myHttp/bo/httpResponse.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/myHttp/bo/httpResponse_example.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pojo/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pojo/po/apiInfoPo.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pojo/vo/apiInfoVo.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/service/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/service/apiInfoService.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/test_main.http" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/log_config.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/controller/erpController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controller/apiInfoController.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controller/apiInfoController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pojo/po/apiInfoPo.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/pojo/po/apiInfoPo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/apiInfoService.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/apiInfoService.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,11 +72,11 @@
       <recent name="C:\Users\11243\PycharmProjects\FastAPIProject\src\env" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\11243\PycharmProjects\FastAPIProject\src" />
       <recent name="C:\Users\11243\PycharmProjects\FastAPIProject" />
+      <recent name="C:\Users\11243\PycharmProjects\FastAPIProject\src\static" />
+      <recent name="C:\Users\11243\PycharmProjects\FastAPIProject\src" />
       <recent name="C:\Users\11243\PycharmProjects\FastAPIProject\docker" />
       <recent name="C:\Users\11243\PycharmProjects\FastAPIProject\models\po" />
-      <recent name="C:\Users\11243\PycharmProjects\FastAPIProject\test" />
     </key>
   </component>
   <component name="RunManager" selected="FastAPI.FastAPIProject">
@@ -161,7 +131,7 @@
       <workItem from="1750229513715" duration="1151000" />
       <workItem from="1750230687991" duration="12656000" />
       <workItem from="1750294946719" duration="10088000" />
-      <workItem from="1750305232825" duration="10500000" />
+      <workItem from="1750305232825" duration="33182000" />
     </task>
     <servers />
   </component>
@@ -169,6 +139,6 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/FastAPIProject$FastAPIProject.coverage" NAME="FastAPIProject 覆盖结果" MODIFIED="1750319755363" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/FastAPIProject$FastAPIProject.coverage" NAME="FastAPIProject 覆盖结果" MODIFIED="1750416298879" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

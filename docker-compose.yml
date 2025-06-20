@@ -1,39 +1,46 @@
-
 services:
   app:
     build:
-      context: ..
-      dockerfile: ../Dockerfile
+      context: .
+      dockerfile: Dockerfile
     container_name: stone_ai_fastapi
     restart: always
     ports:
       - "8000:8000"
     volumes:
-      - ../:/app
+      - ./:/app
     environment:
-      - DATABASE_URL=stone_ai_db:root@localhost:3306/stone_ai_db?charset=utf8mb4
+      - DATABASE_URL=root:root@db:3306/stone_ai_db?charset=utf8mb4
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - fastapi_network
 
-#  db:
-#    image: mysql:8.0
-#    container_name: ai_mysql
-#    restart: always
-#    ports:
-#      - "3306:3306"  # 默认MySQL端口
-#    environment:
-#      MYSQL_ROOT_PASSWORD: root  # 设置MySQL root密码
-#      MYSQL_DATABASE: stone_ai_db  # 设置初始数据库名称
-#    volumes:
-#      - mysql_data:/var/lib/mysql  # 数据卷映射
-#    networks:
-#      - fastapi_network
+  db:
+    image: mysql:8.0
+    container_name: stone_ai_mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: stone_ai_db
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fastapi_network
 
 networks:
   fastapi_network:
     driver: bridge
 
-#volumes:
-#  mysql_data:
+volumes:
+  mysql_data:

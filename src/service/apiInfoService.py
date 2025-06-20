@@ -3,6 +3,7 @@ from typing import List, Dict
 from src.pojo.po.apiInfoPo import APIInfo
 
 
+
 def api_info_2_struct_str(api_infos: APIInfo) -> Dict:
     """
     以结构化字符串的形式返回API信息，用于API结构获取

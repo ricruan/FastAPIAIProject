@@ -22,7 +22,7 @@ class APIInfo(SQLModel, table=True):
     ]
 
 
-    id: Optional[int] = Field(
+    id: Optional[str] = Field(
         default=None,
         primary_key=True,
         description="唯一标识",
