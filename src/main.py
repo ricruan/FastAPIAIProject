@@ -9,7 +9,9 @@ logger = logging.getLogger(__name__)
 
 # 先初始化日志 再导入其他模块
 from fastapi import FastAPI
-from .controller import apiInfoController, erpController
+from .controller.ai import apiInfoController
+from .controller.erp import erpController
+from .controller.dify import difyController
 from .db.db import create_tables
 from fastapi.openapi.docs import get_swagger_ui_html
 from starlette.staticfiles import StaticFiles
@@ -22,6 +24,7 @@ app = FastAPI(docs_url=None, redoc_url=None)  # 禁用默认的 docs 和 redoc
 
 app.include_router(apiInfoController.router)
 app.include_router(erpController.router)
+app.include_router(difyController.router)
 
 
 # 挂载本地静态文件

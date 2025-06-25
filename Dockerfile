@@ -29,4 +29,5 @@ COPY . .
 EXPOSE 8000
 
 # 启动命令
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", \
+     "--timeout-keep-alive", "3600", "--ws-ping-interval", "30"]

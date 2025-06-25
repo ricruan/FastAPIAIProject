@@ -34,10 +34,8 @@ engine = init_db()
 
 def create_tables():
     """创建所有数据库表"""
-    logger.info("开始创建数据库表")
     try:
         SQLModel.metadata.create_all(engine)
-        logger.info("数据库表创建成功")
     except Exception as e:
         logger.error("数据库表创建失败: %s", str(e))
         raise

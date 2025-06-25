@@ -6,6 +6,7 @@ CREATE TABLE `api_info` (
   `api_code` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'API编码',
   `api_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'API名称',
   `api_url` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'API访问路径',
+  `api_header` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'API请求头',
   `api_desc` text COLLATE utf8mb4_unicode_ci COMMENT 'API描述',
   `api_param_struct` text COLLATE utf8mb4_unicode_ci COMMENT 'API参数结构',
   `api_param_desc` text COLLATE utf8mb4_unicode_ci COMMENT 'API参数描述',

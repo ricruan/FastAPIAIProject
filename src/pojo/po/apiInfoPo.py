@@ -16,10 +16,7 @@ class APIInfo(SQLModel, table=True):
         "api_param_desc", "api_param_template"
     ]
     
-    # 定义应该使用精确匹配的字段列表
-    exact_search_fields: ClassVar[List[str]] = [
-        "id", "api_code", "create_time", "update_time"
-    ]
+
 
 
     id: Optional[str] = Field(
@@ -47,6 +44,11 @@ class APIInfo(SQLModel, table=True):
     api_url: str = Field(
         max_length=512,
         description="API请求地址",
+    )
+
+    api_header: str = Field(
+        max_length=512,
+        description="API请求头",
     )
 
     api_desc: str = Field(
