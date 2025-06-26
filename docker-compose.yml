@@ -9,6 +9,7 @@ services:
       - "8000:8000"
     volumes:
       - ./:/app
+      - ./logs:/app/logs
     environment:
       - DATABASE_URL=root:root@db:3306/stone_ai_db?charset=utf8mb4
     depends_on:
