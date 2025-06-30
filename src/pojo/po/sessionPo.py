@@ -21,49 +21,58 @@ class SessionFieldsMixin:
         primary_key=True,
         max_length=64,
         description="唯一标识",
+        sa_column_kwargs={"comment": "唯一标识"}
     )
 
     dify_conversation_id: Optional[str] = Field(
         max_length=64,
         description="dify的会话ID",
+        sa_column_kwargs={"comment": "dify的会话ID"}
     )
 
     session_title: Optional[str] = Field(
         default=None,
         max_length=255,
         description="会话标题",
+        sa_column_kwargs={"comment": "会话标题"}
     )
 
     session_desc: Optional[str] = Field(
         default=None,
         description="会话描述",
+        sa_column_kwargs={"comment": "会话描述"}
     )
 
     create_time: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc),
         description="创建时间",
+        sa_column_kwargs={"comment": "创建时间"}
     )
 
     update_time: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc),
         description="更新时间",
+        sa_column_kwargs={"comment": "更新时间"}
     )
 
     user_id: str = Field(
         max_length=64,
         index=True,
         description="用户ID",
+        sa_column_kwargs={"comment": "用户ID"}
     )
 
     token: Optional[str] = Field(
         default=None,
         max_length=255,
         description="token",
+        sa_column_kwargs={"comment": "token"}
     )
 
     history_semantic: Optional[str] = Field(
         default=None,
         description="历史会话语义",
+        sa_column_kwargs={"comment": "历史会话语义"}
     )
 
 
@@ -72,6 +81,13 @@ class Session(SessionFieldsMixin, SQLModel, table=True):
     会话表模型
     """
     __tablename__ = "session"
+    
+    # 定义表级参数，包括表注释
+    __table_args__ = {
+        "comment": "会话表",
+        "mysql_charset": "utf8mb4",
+        "mysql_collate": "utf8mb4_unicode_ci"
+    }
 
     # 定义索引
     class Config:

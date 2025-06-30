@@ -15,6 +15,13 @@ class SessionDetail(SQLModel, table=True):
     """
     __tablename__ = "session_detail"
 
+    # 定义表级参数，包括表注释
+    __table_args__ = {
+        "comment": "会话详情表",
+        "mysql_charset": "utf8mb4",
+        "mysql_collate": "utf8mb4_unicode_ci"
+    }
+
     # 定义应该使用like查询的字段列表
     like_search_fields: ClassVar[List[str]] = [
         "dialog_carrier", "api_input", "api_output",
@@ -25,75 +32,89 @@ class SessionDetail(SQLModel, table=True):
         primary_key=True,
         max_length=64,
         description="唯一标识",
+        sa_column_kwargs={"comment": "唯一标识"}
     )
 
     session_id: str = Field(
         max_length=64,
         foreign_key="session.id",
         description="会话主题id",
+        sa_column_kwargs={"comment": "会话主题id"}
     )
 
     dialog_carrier: Optional[str] = Field(
         default=None,
         max_length=255,
         description="对话载体",
+        sa_column_kwargs={"comment": "对话载体"}
     )
 
     api_input: Optional[str] = Field(
         default=None,
         description="接口原始入参",
+        sa_column_kwargs={"comment": "接口原始入参"}
     )
 
     api_output: Optional[str] = Field(
         default=None,
         description="接口原始出参",
+        sa_column_kwargs={"comment": "接口原始出参"}
     )
 
     user_question: Optional[str] = Field(
         default=None,
         description="对话用户问题",
+        sa_column_kwargs={"comment": "对话用户问题"}
     )
 
     final_response: Optional[str] = Field(
         default=None,
         description="对话最终返回",
+        sa_column_kwargs={"comment": "对话最终返回"}
     )
 
     process_log: Optional[str] = Field(
         default=None,
         description="会话流程日志",
+        sa_column_kwargs={"comment": "会话流程日志"}
     )
 
     model: Optional[str] = Field(
         default=None,
         max_length=100,
         description="模型",
+        sa_column_kwargs={"comment": "模型"}
     )
 
     response_mode: Optional[str] = Field(
         default=None,
         max_length=100,
         description="响应模式",
+        sa_column_kwargs={"comment": "响应模式"}
     )
 
     agent: Optional[str] = Field(
         default=None,
         max_length=100,
         description="智能体",
+        sa_column_kwargs={"comment": "智能体"}
     )
 
     status: Optional[str] = Field(
         default=None,
         max_length=12,
         description="会话状态",
+        sa_column_kwargs={"comment": "会话状态"}
     )
 
     create_time: datetime = Field(
         description="创建时间",
+        sa_column_kwargs={"comment": "创建时间"}
     )
 
     finish_time: datetime = Field(
         description="结束时间",
+        sa_column_kwargs={"comment": "结束时间"}
     )
 
     def handle_dict(self):
