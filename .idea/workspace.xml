@@ -5,11 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="db70534d-715e-4cc5-a79f-85ef3738f13c" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/src/controller/ai/sessionController.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/controller/ai/sessionDetailController.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/dao/sessionDao.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/dao/sessionDetailDao.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/db/ddl/dml.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/exception/aiError.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pojo/po/sessionDetailPo.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pojo/po/sessionPo.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/service/sessionDetailService.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/service/sessionService.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/project.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controller/erp/erpController.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controller/erp/erpController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controller/ai/apiInfoController.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controller/ai/apiInfoController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controller/dify/difyController.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controller/dify/difyController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/db/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/db.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/db/ddl/ddl.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/ddl/ddl.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/service/erpService.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/erpService.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pojo/vo/difyResponse.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/pojo/vo/difyResponse.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/difyService.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/difyService.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/dataUtils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/dataUtils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,7 +57,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "FastAPI.FastAPIProject.executor": "Run",
+    "FastAPI.FastAPIProject.executor": "Debug",
     "HTTP 请求.test_main | #1.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "Python.test1.executor": "Run",
@@ -156,15 +171,37 @@
       <workItem from="1750294946719" duration="10088000" />
       <workItem from="1750305232825" duration="62034000" />
       <workItem from="1750764518210" duration="77000" />
-      <workItem from="1750812818310" duration="26559000" />
+      <workItem from="1750812818310" duration="74332000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/utils/dataUtils.py</url>
+          <line>33</line>
+          <option name="timeStamp" value="27" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/FastAPIProject$FastAPIProject.coverage" NAME="FastAPIProject 覆盖结果" MODIFIED="1750901763502" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/FastAPIProject$FastAPIProject.coverage" NAME="FastAPIProject 覆盖结果" MODIFIED="1751246707529" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/FastAPIProject$test1.coverage" NAME="test1 覆盖结果" MODIFIED="1750672567251" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/test" />
   </component>
 </project>

@@ -19,11 +19,42 @@ CREATE TABLE `api_info` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='API信息表';
 
 
-INSERT INTO stone_ai_db.api_info
-(id, type_code, api_code, api_name, api_url, api_header, api_desc, api_param_struct, api_param_desc, api_param_template, create_time, update_time)
-VALUES('3fdify2e8a7c-1d9e-4b6f-a8c3-7b5d2e6f4a1c', 'dify', 'jixiaomei', '极小妹Dify接口', 'http://1.12.43.211/v1/chat-messages', '{"Authorization":"Bearer app-4Vs16Hilvp1K2UtlBn3mqLBa"}', '极小妹的Dify接口', NULL, NULL, NULL, '2025-06-23 03:21:57', '2025-06-23 03:27:30');
-INSERT INTO stone_ai_db.api_info
-(id, type_code, api_code, api_name, api_url, api_header, api_desc, api_param_struct, api_param_desc, api_param_template, create_time, update_time)
-VALUES('3fdify21535c-1d9e-4b6f-a8c3-7b5d2e6f4a1c', 'dify', 'erp_exec_sql', 'ERP执行SQL接口', 'https://pmserp.toasin.cn/api/demo/executeSqlQuery', '', 'ERP系统执行SQL的接口', NULL, NULL, NULL, '2025-06-23 03:21:57', '2025-06-23 03:27:30');
+-- stone_ai_db.`session` definition
+
+CREATE TABLE `session` (
+  `id` varchar(64) NOT NULL COMMENT '唯一标识',
+  `dify_conversation_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'dify的会话ID',
+  `session_title` varchar(255) DEFAULT NULL COMMENT '会话标题',
+  `session_desc` text COMMENT '会话描述',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `user_id` varchar(64) NOT NULL COMMENT '用户ID',
+  `token` varchar(255) DEFAULT NULL COMMENT 'token',
+  `history_semantic` text COMMENT '历史会话语义',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='会话表';
 
 
+-- stone_ai_db.session_detail definition
+CREATE TABLE `session_detail` (
+  `id` varchar(64) NOT NULL COMMENT '唯一标识',
+  `session_id` varchar(64) NOT NULL COMMENT '会话主题id',
+  `dialog_carrier` varchar(255) DEFAULT NULL COMMENT '对话载体',
+  `api_input` text COMMENT '接口原始入参',
+  `api_output` text COMMENT '接口原始出参',
+  `user_question` text COMMENT '对话用户问题',
+  `final_response` text COMMENT '对话最终返回',
+  `process_log` text COMMENT '会话流程日志',
+  `model` varchar(100) DEFAULT NULL COMMENT '模型',
+  `response_mode` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '响应模式',
+  `agent` varchar(100) DEFAULT NULL COMMENT '智能体',
+  `status` varchar(12) DEFAULT NULL COMMENT '会话状态',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `finish_time` datetime DEFAULT NULL COMMENT '结束时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_session_id` (`session_id`),
+  KEY `idx_create_time` (`create_time`),
+  CONSTRAINT `fk_session_detail_session` FOREIGN KEY (`session_id`) REFERENCES `session` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='会话详情表';

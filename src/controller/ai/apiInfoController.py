@@ -8,9 +8,9 @@ from src.pojo.vo.apiInfoVo import APIInfoCreate
 from src.myHttp.bo.httpResponse import HttpResponse, HttpResponseModel
 from src.service.apiInfoService import get_api_info_4_task_classify, api_info_2_struct_str
 
-router = APIRouter(prefix="/api/info", tags=["API Info"])
+router = APIRouter(prefix="/ai/api", tags=["API Info"])
 
-@router.get("/api/{api_code}")
+@router.get("/{api_code}")
 async def get_api_info_by_api_code(api_code: str, db: Session = Depends(get_db)) :
     """
     根据API编码获取API信息

@@ -17,7 +17,6 @@ def init_db():
     """初始化数据库引擎"""
     global engine
     
-    logger.info("数据库初始化开始")
     logger.info("数据库连接URL: %s", DATABASE_URL)
     
     try:

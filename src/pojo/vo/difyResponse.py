@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 
 
+ERROR_REPLY_TEXT="哎呀呀，我被这个问题难住了呢！我会继续努力学习哒~"
+
 class DifyResponse(BaseModel):
     type: str
     data: object
@@ -15,4 +17,4 @@ class DifyResponse(BaseModel):
 
     @classmethod
     def not_found_data(cls):
-        return cls(type="text", data="哎呀呀，我被这个问题难住了呢！我会继续努力学习哒~")
+        return cls(type="text", data=ERROR_REPLY_TEXT)
