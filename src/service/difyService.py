@@ -1,8 +1,6 @@
 import json
 import logging
-
 from src.pojo.vo.difyResponse import DifyResponse
-from src.service.erpService import erp_execute_sql
 from src.utils.dataUtils import is_valid_json
 
 logger = logging.getLogger(__name__)
@@ -22,14 +20,8 @@ async def dify_result_handler(result) -> DifyResponse:
     json_data = result
     if json_data["answer"] is not None:
         answer = json_data["answer"]
-
         if is_valid_json(answer):
-            answer = json.loads(answer)
-            # todo  看之后是否需要去掉这块逻辑， 当时是因为执行SQL接口调不通 想着异常之后在这里手动调
-            if answer.get("type") == "sql":
-                result = await erp_execute_sql(answer.get("data"))
-                return DifyResponse.to_data(result)
-
+           answer = json.loads(answer)
         if isinstance(answer, dict):
             if "data" in answer:
                 return DifyResponse.to_data(answer.get("data"))
@@ -42,6 +34,5 @@ async def dify_result_handler(result) -> DifyResponse:
         return NO_DATA_RESPONSE
     else:
         return NO_DATA_RESPONSE
-
 
 

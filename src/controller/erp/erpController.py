@@ -18,17 +18,7 @@ class SQLQuery(BaseModel):
 
 @router.post("/execute-sql-query")
 async def execute_sql_query(sql: SQLQuery, db: Session = Depends(get_db)):
+    response = await erp_execute_sql(sql, db)
 
-    try:
-        # 发送 POST 请求
-        response = await erp_execute_sql(sql,db)
-
-        return HttpResponse.success(response)
-
-    except requests.exceptions.Timeout:
-        return HttpResponse.error(msg="请求超时，请稍后重试！")
-
-    except requests.exceptions.RequestException as e:
-        # 其他请求异常（如网络错误、SSL 错误等）
-        return HttpResponse.error(msg="请求失败，请稍后重试！" + e.__str__())
+    return HttpResponse.success(response)
 

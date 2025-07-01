@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from typing import Optional, ClassVar, List
 
 from pydantic import BaseModel
+from sqlalchemy import Text
 from sqlmodel import SQLModel, Field, Index
 
 from src.pojo.po.sessionDetailPo import SessionDetail
@@ -39,6 +40,7 @@ class SessionFieldsMixin:
 
     session_desc: Optional[str] = Field(
         default=None,
+        sa_type=Text,
         description="会话描述",
         sa_column_kwargs={"comment": "会话描述"}
     )
@@ -64,7 +66,7 @@ class SessionFieldsMixin:
 
     token: Optional[str] = Field(
         default=None,
-        max_length=255,
+        sa_type=Text,
         description="token",
         sa_column_kwargs={"comment": "token"}
     )

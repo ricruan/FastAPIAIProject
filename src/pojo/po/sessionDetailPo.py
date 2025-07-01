@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime
 from typing import Optional, ClassVar, List
 
+from sqlalchemy import Text
 from sqlmodel import SQLModel, Field, Index, text, ForeignKey
 
 from src.pojo.vo.difyResponse import DifyResponse
@@ -52,29 +53,34 @@ class SessionDetail(SQLModel, table=True):
     api_input: Optional[str] = Field(
         default=None,
         description="接口原始入参",
+        sa_type=Text,
         sa_column_kwargs={"comment": "接口原始入参"}
     )
 
     api_output: Optional[str] = Field(
         default=None,
+        sa_type=Text,
         description="接口原始出参",
         sa_column_kwargs={"comment": "接口原始出参"}
     )
 
     user_question: Optional[str] = Field(
         default=None,
+        sa_type=Text,
         description="对话用户问题",
         sa_column_kwargs={"comment": "对话用户问题"}
     )
 
     final_response: Optional[str] = Field(
         default=None,
+        sa_type=Text,
         description="对话最终返回",
         sa_column_kwargs={"comment": "对话最终返回"}
     )
 
     process_log: Optional[str] = Field(
         default=None,
+        sa_type=Text,
         description="会话流程日志",
         sa_column_kwargs={"comment": "会话流程日志"}
     )
@@ -137,18 +143,23 @@ class SessionDetail(SQLModel, table=True):
         self.finish_time = datetime.now()
         self.api_output = reason
         self.status = "500"
-        self.final_response = DifyResponse.not_found_data()
+        self.final_response = DifyResponse.not_found_data().model_dump()
 
 
-    def when_success(self, response: DifyResponse):
+    def when_success(self,output: dict, response: DifyResponse|str):
         """
-        当成功时
-        :return:
+        当成功时,修改自身部分属性
+        :param output: api的返回结果 dict类型
+        :param response: 最终的返回体
+        :return: void
         """
         self.finish_time = datetime.now()
-        self.api_output = str(response.model_dump())
+        self.api_output = str(output)
         self.status = "200"
-        self.final_response = str(response.model_dump())
+        if isinstance(response, DifyResponse):
+            self.final_response = str(response.model_dump())
+        else :
+            self.final_response = str(response)
 
     @classmethod
     def from_dify_jxm(cls, jxm: DifyJxm) -> "SessionDetail":
