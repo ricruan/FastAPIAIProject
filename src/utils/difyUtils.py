@@ -23,12 +23,6 @@ def get_value_from_stream_response_by_key(response: str, key: str) -> str:
 def dify_stream_response_handler(response: str) -> str:
     """
     处理Dify的SSE流式响应，提取有效的answer字段内容。
-
-    Args:
-        response: 原始SSE响应字符串（可能以"data: "开头，或直接是JSON字符串）
-
-    Returns:
-        提取到的answer内容（如果存在），否则返回空字符串
     """
     return get_value_from_stream_response_by_key(response, "answer")
 
@@ -36,7 +30,5 @@ def dify_stream_response_handler(response: str) -> str:
 def dify_get_conversation_id_from_stream(response: str) -> str:
     """
     从SSE流式响应中提取conversation_id字段
-    :param response: 原始SSE响应字符串
-    :return:
     """
     return get_value_from_stream_response_by_key(response, "conversation_id")

@@ -3,6 +3,7 @@ from typing import Optional, Dict, List, Any
 from sqlalchemy import Sequence
 from sqlmodel import Session, select
 
+from src.exception.aiException import AIException
 from src.pojo.po.apiInfoPo import APIInfo
 
 def create_api_info(session: Session, api_info: APIInfo):
@@ -14,6 +15,8 @@ def create_api_info(session: Session, api_info: APIInfo):
 def get_info_by_api_code(session: Session, api_code: str)  -> Optional[APIInfo]:
     statement = select(APIInfo).where(APIInfo.api_code == api_code)
     api = session.exec(statement).first()
+    if api is None:
+        raise AIException.quick_raise(f"没有找到对应的API信息(api_code:{api_code})")
     return api
 
 def get_info_by_type_code(session: Session, type_code: str)  -> Optional[Sequence[APIInfo]]:

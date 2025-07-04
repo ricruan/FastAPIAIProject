@@ -5,9 +5,8 @@ from typing import Optional, Dict, Any, List
 
 from src.dao.sessionDao import create_session, get_recent_sessions, get_session_by_id, update_session
 from src.dao.sessionDetailDao import get_session_details_by_session_id
-from src.exception.aiError import AIError
+from src.exception.aiException import AIException
 from src.pojo.po.sessionPo import Session as SessionModel, SessionInfo
-from src.utils.dataUtils import copy_attributes_to_new_instance
 
 
 def create_session_default(session: Session,user_id: str = None , token: str = None):
@@ -50,7 +49,7 @@ def when_search_session(session: Session,session_id: str) -> Optional[SessionInf
     """
     session_model = get_session_by_id(session,session_id)
     if not session_model:
-        raise AIError.quick_raise(f"未查询到指定会话ID {session_id} 的对应数据")
+        raise AIException.quick_raise(f"未查询到指定会话ID {session_id} 的对应数据")
     history_list = get_session_details_by_session_id(session,session_model.id)
     session_info = session_model.to_session_info(list(history_list))
     session_model.update_time = datetime.now()

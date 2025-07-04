@@ -4,6 +4,7 @@ from openai import OpenAI
 #
 client = OpenAI(api_key="sk-646171ae9662439cbc8d41da59188e2a", base_url="https://api.deepseek.com")
 
+# noinspection PyTypeChecker
 response = client.chat.completions.create(
     model="deepseek-chat",
     messages=[

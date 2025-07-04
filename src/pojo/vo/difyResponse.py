@@ -16,5 +16,9 @@ class DifyResponse(BaseModel):
         return cls(type="data", data=data)
 
     @classmethod
+    def to_url(cls, data: str):
+        return cls(type="url", data=data)
+
+    @classmethod
     def not_found_data(cls):
         return cls(type="text", data=ERROR_REPLY_TEXT)

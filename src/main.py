@@ -5,7 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from starlette.responses import JSONResponse
 
 from src.utils.log_config import setup_logging
-from .exception.aiError import AIError
+from .exception.aiException import AIException
 from .myHttp.bo.httpResponse import HttpResponse
 from fastapi import FastAPI, Request, status, HTTPException
 
@@ -62,8 +62,8 @@ async def say_hello(name: str):
     return {"message": f"Hello {name}"}
 
 
-@app.exception_handler(AIError)
-async def api_error_handler(request: Request, exc: AIError):
+@app.exception_handler(AIException)
+async def api_error_handler(request: Request, exc: AIException):
     """处理自定义AI异常"""
     request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
     logger.error(f"APIError - RequestID: {request_id}, Error: {exc}")

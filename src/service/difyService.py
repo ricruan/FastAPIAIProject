@@ -9,7 +9,7 @@ NO_DATA_RESPONSE = DifyResponse.not_found_data()
 
 
 
-async def dify_result_handler(result) -> DifyResponse:
+async def dify_result_handler(result) -> DifyResponse|list:
     """
     处理Dify服务返回结果
     :param result: 输入结果，可能是dict或list
@@ -27,8 +27,8 @@ async def dify_result_handler(result) -> DifyResponse:
                 return DifyResponse.to_data(answer.get("data"))
             else:
                 return NO_DATA_RESPONSE
-        # elif isinstance(answer, list):
-        #     return answer
+        elif isinstance(answer, list):
+            return answer
         elif isinstance(answer, str):
             return DifyResponse.to_text(answer)
         return NO_DATA_RESPONSE

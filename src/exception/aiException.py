@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from pydantic import BaseModel
 from typing import Optional
 
-class AIError(Exception):
+class AIException(Exception):
     """基础AI异常类"""
     def __init__(self, code: int, message: str, detail: Optional[str] = None):
         self.code = code

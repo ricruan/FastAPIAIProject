@@ -1,6 +1,7 @@
 import json
 import copy
 from typing import Type, TypeVar, Any
+from urllib.parse import urlparse
 
 T = TypeVar('T')
 
@@ -19,39 +20,31 @@ def is_valid_json(json_str):
         return False
 
 
-def copy_attributes_to_new_instance(cls: Type[T], source_instance: Any) -> T:
+def is_valid_url(url_str: str) -> bool:
     """
-    创建类的新实例，并将源实例的所有同名属性深拷贝到新实例
+    严格校验输入的字符串是否是有效的URL
 
-    Args:
-        cls: 目标类（要创建实例的类）
-        source_instance: 源实例（从中复制属性的实例）
+    要求:
+    - 必须包含scheme(如http/https)
+    - 必须包含netloc(域名或IP)
+    - 可以包含path, params, query, fragment等可选部分
 
-    Returns:
-        目标类的新实例，包含源实例的同名属性（深拷贝）
+    :param url_str: 待校验的字符串
+    :return: 如果是有效URL返回True，否则返回False
     """
-    # 创建目标类的新实例
-    new_instance = cls()
+    try:
+        result = urlparse(url_str)
+        # 严格检查: 必须有scheme和netloc
+        if not all([result.scheme, result.netloc]):
+            return False
 
-    # 获取源实例的所有属性名
-    source_attrs = set(dir(source_instance))
+        # 可选: 检查scheme是否是http或https
+        # if result.scheme not in ('http', 'https'):
+        #     return False
 
-    # 遍历源实例的所有属性
-    for attr_name in source_attrs:
-        # 跳过特殊方法和私有属性（以__开头和结尾的）
-        if attr_name.startswith('__') and attr_name.endswith('__'):
-            continue
+        return True
+    except ValueError:
+        return False
 
-        # 获取源实例的属性值
-        try:
-            source_value = getattr(source_instance, attr_name)
-        except AttributeError:
-            continue
 
-        # 如果目标类也有同名属性，则进行深拷贝赋值
-        if hasattr(new_instance, attr_name):
-            # 深拷贝属性值
-            copied_value = copy.deepcopy(source_value)
-            setattr(new_instance, attr_name, copied_value)
 
-    return new_instance
