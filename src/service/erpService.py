@@ -18,17 +18,20 @@ async def erp_execute_sql(sql, session: Session):
     else:
         sql = sql.model_dump()
     response = await normal_post(api_info.api_url, data=sql, headers={})
+    erp_response_check(response)
     return response['data']
 
 async def erp_generate_popi(data: dict, session: Session):
     api_info = get_info_by_api_code(session,ERP_GEN_POPI_API_CODE)
     response = await post_with_query_params(api_info.api_url, params=data, headers=data)
+    erp_response_check(response)
     return response['data']
 
 
 async def erp_order_search(data: dict, session: Session):
     api_info = get_info_by_api_code(session,ERP_ORDER_SEARCH_API_CODE)
     response = await form_data_post(api_info.api_url, form_data=data, headers={"token": data['token']})
+    erp_response_check(response)
     return get_data_from_erp_page_response(response)
 
 
@@ -40,3 +43,12 @@ def get_data_from_erp_page_response(response):
     :return:  纯净数据
     """
     return response['data']['list']
+
+def erp_response_check(response):
+    """
+    erp接口返回结果检查, code 为 0 1 时是正常的
+    :param response: erp接口返回结果
+    :return: 无
+    """
+    if response['code'] not in [1,0] :
+        raise Exception(f"ERP接口异常:{response['msg']}")

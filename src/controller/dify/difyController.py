@@ -21,11 +21,6 @@ from src.utils.dataUtils import is_valid_json
 router = APIRouter(prefix="/dify", tags=["DIFY 相关"])
 
 
-# 请求头
-headers = {
-    "Content-Type": "application/json",
-    # "Authorization": "Bearer YOUR_ACCESS_TOKEN"  # 如果需要认证，取消注释并替换 Token
-}
 JXM_API_CODE = "jixiaomei" # pmspte 更换成这个
 
 

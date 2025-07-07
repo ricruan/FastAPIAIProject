@@ -68,7 +68,7 @@ async def api_error_handler(request: Request, exc: AIException):
     request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
     logger.error(f"APIError - RequestID: {request_id}, Error: {exc}")
 
-    return JSONResponse(status_code=200,content=HttpResponse.error(msg=exc.message, code=exc.code,data = exc.detail).model_dump())
+    return JSONResponse(status_code=exc.code,content=HttpResponse.error(msg=exc.message, code=exc.code,data = exc.detail).model_dump())
 
 
 @app.exception_handler(HTTPException)
@@ -77,7 +77,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
     logger.error(f"HTTPException - RequestID: {request_id}, Error: {exc}")
 
-    return JSONResponse(status_code=200,content=HttpResponse.error(msg=exc.detail, code=exc.status_code).model_dump())
+    return JSONResponse(status_code=exc.status_code,content=HttpResponse.error(msg=exc.detail, code=exc.status_code).model_dump())
 
 
 @app.exception_handler(RequestValidationError)
@@ -86,7 +86,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
     logger.error(f"ValidationError - RequestID: {request_id}, Error: {exc.errors()}")
 
-    return JSONResponse(status_code=200,
+    return JSONResponse(status_code=500,
                         content=HttpResponse.error(msg="参数校验失败" ,
                                                    code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                                                    data = exc.errors()).model_dump()
@@ -99,7 +99,7 @@ async def global_exception_handler(request: Request, exc: Exception):
     request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
     logger.error(f"UnhandledException - RequestID: {request_id}, Error: {str(exc)}", exc_info=True)
 
-    return JSONResponse(status_code=200,
+    return JSONResponse(status_code=500,
                         content=HttpResponse.error(msg="服务器内部错误" + str(exc) ,
                                                    code=status.HTTP_500_INTERNAL_SERVER_ERROR).model_dump()
                         )

@@ -21,7 +21,12 @@ def init_db():
     
     try:
         # 创建引擎（echo=True可显示SQL日志）
-        engine = create_engine(DATABASE_URL, echo=True)
+        engine = create_engine(
+            DATABASE_URL,
+            echo=True,
+            pool_pre_ping=True,  # 启用连接健康检查
+            pool_recycle=3600  # 可选：每1小时回收连接（避免 MySQL 主动关闭）
+        )
         logger.info("数据库引擎创建成功")
         return engine
     except Exception as e:
