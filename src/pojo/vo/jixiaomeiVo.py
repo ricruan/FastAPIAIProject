@@ -16,7 +16,7 @@ class DifyJxm(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "query": "user",
+                "query": "你好",
                 "user_id": "123",
                 "token": "123",
                 "nickname": "123",

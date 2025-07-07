@@ -3,6 +3,8 @@ import json
 import random
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
+
+from src.common.enum.codeEnum import CodeEnum
 from src.dao.apiInfoDao import get_info_by_api_code
 from src.dao.sessionDao import update_session
 from src.dao.sessionDetailDao import create_session_detail
@@ -21,15 +23,13 @@ from src.utils.dataUtils import is_valid_json
 router = APIRouter(prefix="/dify", tags=["DIFY 相关"])
 
 
-JXM_API_CODE = "jixiaomei" # pmspte 更换成这个
-
 
 logger = logging.getLogger(__name__)
 
 
 @router.post("/chatflow-jxm")
 async def chatflow_jxm(param: DifyJxm, db: Session = Depends(get_db)):
-    api_code = JXM_API_CODE
+    api_code = CodeEnum.JXM_API_CODE.value
     api_info =get_info_by_api_code(session=db, api_code=api_code)
     api_url = api_info.api_url
     api_header = api_info.api_header

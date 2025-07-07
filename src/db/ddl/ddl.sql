@@ -58,3 +58,20 @@ CREATE TABLE `session_detail` (
   KEY `idx_create_time` (`create_time`),
   CONSTRAINT `fk_session_detail_session` FOREIGN KEY (`session_id`) REFERENCES `session` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='会话详情表';
+
+
+CREATE TABLE `code` (
+  `id` varchar(36) NOT NULL COMMENT '唯一标识，存储UUID',
+  `code` varchar(64) NOT NULL COMMENT '编码',
+  `value` text COMMENT '码值',
+  `desc` text COMMENT '描述',
+  `type` varchar(64) COMMENT '类型',
+  `mapper` varchar(64) COMMENT '映射实体',
+  `parent_code` varchar(64) COMMENT '上级编码',
+  `create_time` date COMMENT '创建时间',
+  `update_time` date COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_code` (`code`),
+  KEY `idx_parent_code` (`parent_code`),
+  KEY `idx_type` (`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='编码表';

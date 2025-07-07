@@ -1,5 +1,6 @@
 import logging
 from src.dao.apiInfoDao import get_info_by_api_code
+from src.exception.aiException import AIException
 from src.myHttp.utils.myHttpUtils import normal_post, post_with_query_params, form_data_post
 from sqlmodel import Session
 
@@ -18,7 +19,6 @@ async def erp_execute_sql(sql, session: Session):
     else:
         sql = sql.model_dump()
     response = await normal_post(api_info.api_url, data=sql, headers={})
-    erp_response_check(response)
     return response['data']
 
 async def erp_generate_popi(data: dict, session: Session):
@@ -51,4 +51,4 @@ def erp_response_check(response):
     :return: 无
     """
     if response['code'] not in [1,0] :
-        raise Exception(f"ERP接口异常:{response['msg']}")
+        raise AIException(f"ERP接口异常:{response['msg']}")
