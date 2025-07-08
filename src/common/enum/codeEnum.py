@@ -2,6 +2,10 @@ from enum import Enum
 
 class CodeEnum(Enum):
     ORDER_SEARCH_MAPPING = ("order_search_mapping","订单搜索接口返回结果字段的中文映射")
+    ERP_EXEC_SQL_API_CODE = ("erp_exec_sql","执行SQL的API编码")
+    ERP_GEN_POPI_API_CODE = ("erp_generate_popi","生成POPI的API编码")
+    ERP_ORDER_SEARCH_API_CODE = ("erp_order_search","订单查询的API编码")
+    ERP_INVENTORY_DETAIL_SEARCH_API_CODE = ("erp_inventory_detail_search","库存详情查询的API编码")
 
     JXM_API_CODE = ("jixiaomei","极小妹接口的API编码")
 

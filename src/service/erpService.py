@@ -1,19 +1,25 @@
+import copy
 import logging
+
+from src.common.enum.codeEnum import CodeEnum
 from src.dao.apiInfoDao import get_info_by_api_code
 from src.exception.aiException import AIException
 from src.myHttp.utils.myHttpUtils import normal_post, post_with_query_params, form_data_post
 from sqlmodel import Session
 
+from src.service.aiCodeService import get_code_value_by_code
+from src.utils.dataUtils import translate_dict_keys_4_list, translate_dict_keys_4_dict
 
 logger = logging.getLogger(__name__)
-ERP_EXEC_SQL_API_CODE = "erp_exec_sql"
-ERP_GEN_POPI_API_CODE = "erp_generate_popi"
-ERP_ORDER_SEARCH_API_CODE = "erp_order_search"
 
 async def erp_execute_sql(sql, session: Session):
-    api_info = get_info_by_api_code(session,ERP_EXEC_SQL_API_CODE)
-
-
+    """
+    执行SQL
+    :param sql:
+    :param session:
+    :return:
+    """
+    api_info = get_info_by_api_code(session,CodeEnum.ERP_EXEC_SQL_API_CODE.value)
     if isinstance(sql,str):
         sql = {"sql": sql}
     else:
@@ -22,17 +28,58 @@ async def erp_execute_sql(sql, session: Session):
     return response['data']
 
 async def erp_generate_popi(data: dict, session: Session):
-    api_info = get_info_by_api_code(session,ERP_GEN_POPI_API_CODE)
+    """
+    生成POPI
+    :param data:
+    :param session:
+    :return:
+    """
+    api_info = get_info_by_api_code(session,CodeEnum.ERP_GEN_POPI_API_CODE.value)
     response = await post_with_query_params(api_info.api_url, params=data, headers=data)
     erp_response_check(response)
     return response['data']
 
 
 async def erp_order_search(data: dict, session: Session):
-    api_info = get_info_by_api_code(session,ERP_ORDER_SEARCH_API_CODE)
+    """
+    订单查询
+    :param data:
+    :param session:
+    :return:
+    """
+    api_info = get_info_by_api_code(session,CodeEnum.ERP_ORDER_SEARCH_API_CODE.value)
     response = await form_data_post(api_info.api_url, form_data=data, headers={"token": data['token']})
     erp_response_check(response)
     return get_data_from_erp_page_response(response)
+
+async def erp_inventory_detail_search(data: dict, session: Session):
+    """
+    库存详情查询
+    :param data:
+    :param session:
+    :return:
+    """
+    api_info = get_info_by_api_code(session,CodeEnum.ERP_INVENTORY_DETAIL_SEARCH_API_CODE.value)
+    response = await form_data_post(api_info.api_url, form_data=data, headers={"token": data['token']})
+    erp_response_check(response)
+    return response['data']
+
+async def erp_inventory_detail_search_by_cn(data: dict, session: Session):
+    """
+    库存详情查询，翻译为中文字段
+    :param data:
+    :param session:
+    :return:
+    """
+    response = await erp_inventory_detail_search(data, session)
+    r1 = copy.deepcopy(response['stockDetails'])
+    del response['stockDetails']
+    result1 = translate_dict_keys_4_dict(response, get_code_value_by_code(session,
+                                                                          CodeEnum.ERP_INVENTORY_DETAIL_SEARCH_API_CODE.value + "_1"))
+    result2 = translate_dict_keys_4_list(r1, get_code_value_by_code(session,
+                                                                    CodeEnum.ERP_INVENTORY_DETAIL_SEARCH_API_CODE.value + "_2"))
+    result1['库存明细'] = result2
+    return result1
 
 
 

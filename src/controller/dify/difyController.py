@@ -14,7 +14,7 @@ from src.myHttp.bo.httpResponse import HttpResponse
 from src.myHttp.utils.myHttpUtils import normal_post, stream_post_and_enqueue
 from src.pojo.po.sessionDetailPo import SessionDetail
 from src.pojo.vo.jixiaomeiVo import DifyJxm
-from src.service.difyService import dify_result_handler, NO_DATA_RESPONSE
+from src.service.difyService import dify_result_handler, NO_DATA_RESPONSE, answer_handler
 from src.service.sessionService import get_user_last_session
 from fastapi.responses import StreamingResponse
 import asyncio
@@ -58,8 +58,8 @@ async def chatflow_jxm(param: DifyJxm, db: Session = Depends(get_db)):
         if param.response_mode == "streaming":
             dify_response = await stream_post_task
             result = dify_response.get("result")
+            result = answer_handler(result)
         if ai_session.dify_conversation_id is None:
-            result = dify_response.get("result")
             # 获取到Dify的会话ID并持久化到本系统的会话表中
             ai_session.dify_conversation_id = dify_response.get("conversation_id")
             update_session(session=db, session_id=ai_session.id, update_data=ai_session.dict())
@@ -70,17 +70,16 @@ async def chatflow_jxm(param: DifyJxm, db: Session = Depends(get_db)):
     try:
         if param.response_mode != "streaming":
             dify_response = await normal_post(api_url, jxm_param, json.loads(api_header))
-            result = await dify_result_handler(dify_response)
+            result = dify_result_handler(dify_response)
             await session_handle()
-            if not isinstance(result, list):
-                result = [result]
             return HttpResponse.success(result)
 
         # 消息队列
         message_queue = asyncio.Queue()
         stream_post_task = asyncio.create_task(
             stream_post_and_enqueue(message_queue, api_url, jxm_param, json.loads(api_header)))
-        return await do_stream_post_dify(message_queue,session_handle)
+        asyncio.create_task(session_handle())
+        return await do_stream_post_dify(message_queue)
     except  Exception as e:
         ai_session_detail.when_error("问答流程异常，没有返回数据")
         create_session_detail(session=db, session_detail=ai_session_detail)
@@ -108,7 +107,7 @@ async def event_stream_fake(text: str):
         await asyncio.sleep(0.2)
         yield f"data: {chunk}\n\n"
 
-async def do_stream_post_dify(message_queue, finally_handle):
+async def do_stream_post_dify(message_queue):
     """
     流式请求Dify,接受一个回调函数，在流输出结束之后执行
     :param message_queue: 消息队列
@@ -141,8 +140,6 @@ async def do_stream_post_dify(message_queue, finally_handle):
             except Exception as e:
                 logger.error(e)
                 break
-            finally:
-                await finally_handle()
     return StreamingResponse(event_stream(), media_type="text/event-stream")
 
 

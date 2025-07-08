@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 from typing import Optional, ClassVar, List
 
 from sqlalchemy import Text
@@ -73,13 +73,13 @@ class Code(SQLModel, table=True):
         sa_column_kwargs={"comment": "上级编码"}
     )
 
-    create_time: Optional[date] = Field(
+    create_time: Optional[datetime] = Field(
         default=None,
         description="创建时间",
         sa_column_kwargs={"comment": "创建时间"}
     )
 
-    update_time: Optional[date] = Field(
+    update_time: Optional[datetime] = Field(
         default=None,
         description="更新时间",
         sa_column_kwargs={"comment": "更新时间"}

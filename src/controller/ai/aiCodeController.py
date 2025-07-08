@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlmodel import Session, select
 from typing import Dict, Any, List, Optional
-from datetime import date
+from datetime import datetime
 import uuid
 
 from src.db.db import get_db
@@ -49,8 +49,8 @@ class CodeCreate(BaseModel):
             type=self.type,
             mapper=self.mapper,
             parent_code=self.parent_code,
-            create_time=date.today(),
-            update_time=date.today()
+            create_time=datetime.now(),
+            update_time=datetime.now()
         )
 
 # 批量创建编码的请求模型

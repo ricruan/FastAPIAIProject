@@ -1,6 +1,6 @@
 import json
 import copy
-from typing import Type, TypeVar, Any
+from typing import Type, TypeVar, Any, Dict, List
 from urllib.parse import urlparse
 
 T = TypeVar('T')
@@ -14,10 +14,67 @@ def is_valid_json(json_str):
     if not isinstance(json_str, str):
         return False
     try:
-        json.loads(json_str)
+        jstr_to_dict(json_str)
         return True
     except json.JSONDecodeError:
         return False
+
+def jstr_to_dict(json_str):
+    try:
+        return json.loads(json_str)
+    except json.JSONDecodeError:
+        return json.loads(json_str.replace('\t', '\\t').replace('\n', '\\n'))
+
+
+def dict_2_json(data: Dict[str, Any], ensure_ascii: bool = False, indent: int = None) -> str:
+    """
+    将单个字典转换为 JSON 字符串
+
+    参数:
+        data: 要转换的字典
+        ensure_ascii: 是否确保 ASCII 编码 (默认 False，允许非 ASCII 字符如中文)
+        indent: 缩进空格数 (None 表示不缩进)
+
+    返回:
+        JSON 格式的字符串
+
+    异常:
+        如果输入不是字典或 JSON 序列化失败，抛出 ValueError
+    """
+    if not isinstance(data, dict):
+        raise ValueError("输入必须是字典类型")
+
+    try:
+        return json.dumps(data, ensure_ascii=ensure_ascii, indent=indent)
+    except (TypeError, ValueError) as e:
+        raise ValueError(f"JSON 序列化失败: {str(e)}")
+
+
+def dict_list_2_json(data_list: List[Dict[str, Any]], ensure_ascii: bool = False, indent: int = None) -> str:
+    """
+    将字典列表转换为 JSON 字符串
+
+    参数:
+        data_list: 要转换的字典列表
+        ensure_ascii: 是否确保 ASCII 编码 (默认 False，允许非 ASCII 字符如中文)
+        indent: 缩进空格数 (None 表示不缩进)
+
+    返回:
+        JSON 格式的字符串
+
+    异常:
+        如果输入不是列表或包含非字典元素，或 JSON 序列化失败，抛出 ValueError
+    """
+    if not isinstance(data_list, list):
+        raise ValueError("输入必须是列表类型")
+
+    if not all(isinstance(item, dict) for item in data_list):
+        raise ValueError("列表中的所有元素必须是字典类型")
+
+    try:
+        return json.dumps(data_list, ensure_ascii=ensure_ascii, indent=indent)
+    except (TypeError, ValueError) as e:
+        raise ValueError(f"JSON 序列化失败: {str(e)}")
 
 
 def is_valid_url(url_str: str) -> bool:
@@ -47,7 +104,7 @@ def is_valid_url(url_str: str) -> bool:
         return False
 
 
-def translate_dict_keys(data_list, key_mapping):
+def translate_dict_keys_4_list(data_list, key_mapping):
     """
     遍历列表中的字典，将键名从英文替换为中文
 
@@ -67,17 +124,33 @@ def translate_dict_keys(data_list, key_mapping):
                 translated_list.append(item)
                 continue
 
-            translated_item = {}
-            for key, value in item.items():
-                # 如果键在映射关系中，使用中文键名，否则保留原键名
-                new_key = key_mapping.get(key, key)
-                translated_item[new_key] = value
-
+            translated_item = translate_dict_keys_4_dict(item, key_mapping)
             translated_list.append(translated_item)
 
         return translated_list
     except Exception as e:
         return data_list
+
+def translate_dict_keys_4_dict(data_dict, key_mapping):
+    """
+    遍历字典，将键名从英文替换为中文
+
+    参数:
+        data_dict: 包含字典的字典
+        key_mapping: 英文键名到中文键名的映射字典
+
+    返回:
+        转换后的字典
+    """
+    try:
+        translated_item = {}
+        for key, value in data_dict.items():
+            # 如果键在映射关系中，使用中文键名，否则保留原键名
+            new_key = key_mapping.get(key, key)
+            translated_item[new_key] = value
+        return translated_item
+    except Exception as e:
+        return data_dict
 
 
 

@@ -8,6 +8,7 @@ from sqlmodel import SQLModel, Field, Index, text, ForeignKey
 
 from src.pojo.vo.difyResponse import DifyResponse
 from src.pojo.vo.jixiaomeiVo import DifyJxm
+from src.utils.dataUtils import dict_list_2_json, dict_2_json
 
 
 class SessionDetail(SQLModel, table=True):
@@ -143,10 +144,10 @@ class SessionDetail(SQLModel, table=True):
         self.finish_time = datetime.now()
         self.api_output = reason
         self.status = "500"
-        self.final_response = DifyResponse.not_found_data().model_dump()
+        self.final_response = dict_list_2_json([DifyResponse.not_found_data().model_dump()])
 
 
-    def when_success(self,output: dict, response: DifyResponse|str):
+    def when_success(self,output: dict, response: DifyResponse|list|str):
         """
         当成功时,修改自身部分属性
         :param output: api的返回结果 dict类型
@@ -154,12 +155,14 @@ class SessionDetail(SQLModel, table=True):
         :return: void
         """
         self.finish_time = datetime.now()
-        self.api_output = str(output)
+        self.api_output = dict_2_json(output)
         self.status = "200"
-        if isinstance(response, DifyResponse):
-            self.final_response = str(response.model_dump())
+        if isinstance(response, list):
+            self.final_response = dict_list_2_json(response)
+        elif  isinstance(response, DifyResponse):
+            self.final_response = dict_list_2_json([response.model_dump()])
         else :
-            self.final_response = str(response)
+            self.final_response = response
 
     @classmethod
     def from_dify_jxm(cls, jxm: DifyJxm) -> "SessionDetail":

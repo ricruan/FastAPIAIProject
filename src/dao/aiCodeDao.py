@@ -1,5 +1,5 @@
 from typing import Optional, Dict, List, Any, Sequence
-from datetime import date
+from datetime import datetime
 
 from sqlmodel import Session, select, update,delete
 
@@ -152,7 +152,7 @@ def update_code(session: Session, code_id: str, update_data: Dict[str, Any]) -> 
             setattr(db_code, field, value)
 
     # 更新更新时间
-    db_code.update_time = date.today()
+    db_code.update_time = datetime.now()
 
     session.add(db_code)
     session.commit()
