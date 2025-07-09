@@ -11,6 +11,10 @@ VALUES('3fdify2e9s6c-1d9e-4b6f-a8c3-7b5d2e6f4a1c', 'erp', 'erp_generate_popi', '
 INSERT INTO stone_ai_db.api_info
 (id, type_code, api_code, api_name, api_url, api_header, api_desc, api_param_struct, api_param_desc, api_param_template, create_time, update_time)
 VALUES('d1d2c3y6s6c-1d9e-4b6f-a8c3-7b5d2e6f4a1c', 'erp', 'erp_order_search', '订单查询接口', 'https://pmserp.toasin.cn/api/sales/querySalesOrders', '', 'ERP系统生成订单查询的接口', NULL, NULL, NULL, '2025-06-23 03:21:57', '2025-06-23 03:27:30');
+INSERT INTO stone_ai_db.api_info
+(id, type_code, api_code, api_name, api_url, api_header, api_desc, api_param_struct, api_param_desc, api_param_template, create_time, update_time)
+VALUES('k1c2x3q36sc-1d9e-4b6f-a8c3-7b5d2e6f4a1c', 'erp', 'erp_inventory_detail_search', '库存详情查询接口', 'https://pmserp.toasin.cn/api/inventory/get_stock_details', '', 'ERP系统生成库存详情查询的接口', NULL, NULL, NULL, '2025-06-23 03:21:57', '2025-06-23 03:27:30');
+
 
 INSERT INTO stone_ai_db.code
 (id, code, value, `desc`, `type`, mapper, parent_code, create_time, update_time)
@@ -23,7 +27,41 @@ INSERT INTO stone_ai_db.code
 VALUES('c2a7687e-0d8e-4991-998e-779b83a4966f', 'erp_inventory_detail_search_2', '{"order_no":"采购单号","intention_type":"采购目的","quantity":"采购数量","outbound_quantity":"库存数量","inventory_age":"库龄"}', 'ERP系统库存详情查询接口返回结果的字段含义映射,第二部分', 'para', NULL, NULL, '2025-07-07', '2025-07-07');
 
 
+INSERT INTO stone_ai_db.code
+(id, code, value, `desc`, `type`, mapper, parent_code, create_time, update_time)
+VALUES('4489af6d-acca-494d-8ff9-e9af3d859871', 'erp_inventory_analysis_prompt', '## 背景
+你是一名数据分析师,正在分析一家公司的库存数据,基于已有的数据挖掘出库存量与市场趋势及资金占用之间的关系,并基于此提出库存优化建议.
 
+## 任务
+1. 基于已有数据对库存现状进行总结
+2. 基于已有数据对库存问题进行分析(滞销风险,资金占用,市场趋势)
+3. 基于已有数据对库存优化提出建议
+
+## 回复示例
+1.库存现状
+- 当前库存量: 200PCS (剩余10%未消耗)
+- 采购时间: 2023年2月1日
+- 库龄: 超过1年(已超出一般IT硬件库存周转周期)
+- 采购价格: 200元/PCS
+- 当前市场价: 180元/PCS (已低于采购价格,存在滞销风险)
+2.库存问题分析
+- 存在滞销风险
+    - 该型号为 DDR4 8G 内存条,当前市场价低于采购价格,存在滞销风险
+    - 市场需求可能逐步转向DDR5,长期库存可能导致进一步贬值
+    - 库龄超过1年，若继续积压,可能面临报废或折价抛售的风险
+- 资金占用
+    - 剩余库存价值 36,000元(200PCS * 180元/PCS)
+    - 采购成本 40,000元(200PCS * 200元/PCS)
+    - 存在资金占用,若长期积压,可能面临资金链断裂的风险
+- 市场趋势
+    - 服务器内存价格受供需影响,DDR4可能进入降价周期，需警惕进一步跌价
+3.建议处理方案
+- 优先内部消化(如适用) :
+    - 与研发部门沟通,是否可以内部消化,优先使用库存
+- 促销/折价销售:
+    - 以170-175元/PCS的价格向渠道商或客户促销，加速周转
+- 二手/翻新市场处理:
+    - 以150-160元/PCS的价格向二手/翻新市场销售', 'ERP相关 库存分析提示词', 'para', NULL, NULL, '2025-07-09', '2025-07-09');
 
 
 

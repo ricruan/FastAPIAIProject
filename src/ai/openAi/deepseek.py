@@ -1,7 +1,10 @@
-from openai import OpenAI
+import asyncio
+from openai import OpenAI, AsyncOpenAI
 from typing import List, Dict, Any, Optional, Union, Literal
+from openai.types.chat import ChatCompletion
 
-def get_deepseek_completion(
+
+async def get_deepseek_completion(
     messages: List[Dict[str, str]], 
     stream: bool = False,
     model: str = "deepseek-chat",
@@ -22,10 +25,10 @@ def get_deepseek_completion(
         OpenAI API 的响应对象
     """
     # 创建 OpenAI 客户端
-    client = OpenAI(api_key=api_key, base_url=base_url)
+    client = AsyncOpenAI(api_key=api_key, base_url=base_url)
     
     # 调用 API 获取完成结果
-    response = client.chat.completions.create(
+    response = await client.chat.completions.create(
         model=model,
         messages=messages,
         stream=stream
@@ -33,14 +36,28 @@ def get_deepseek_completion(
     
     return response
 
+def handle_ds_response_block(response: ChatCompletion) -> str:
+    """
+    阻塞模式下从ds返回结果中解析答案
+    :param response: ds原始返回结果
+    :return: 答案
+    """
+    result = response.choices[0].message.content
+    return result
+
 # 示例用法
 if __name__ == "__main__":
-    # 示例消息
     example_messages = [
         {"role": "system", "content": "You are a helpful assistant"},
-        {"role": "user", "content": "你好，你是谁"},
+        {"role": "user", "content": "讲一个短故事"},
     ]
-    
-    # 调用函数获取响应
-    response = get_deepseek_completion(example_messages)
-    print(response)
+
+
+    async def main():
+        response = await get_deepseek_completion(example_messages, stream=False)
+        print(handle_ds_response_block(response))
+        # async for chunk in response:
+        #     print(chunk.choices[0].delta.content, end="", flush=True)
+
+
+    asyncio.run(main())

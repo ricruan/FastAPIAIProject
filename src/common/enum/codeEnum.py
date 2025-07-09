@@ -6,6 +6,7 @@ class CodeEnum(Enum):
     ERP_GEN_POPI_API_CODE = ("erp_generate_popi","生成POPI的API编码")
     ERP_ORDER_SEARCH_API_CODE = ("erp_order_search","订单查询的API编码")
     ERP_INVENTORY_DETAIL_SEARCH_API_CODE = ("erp_inventory_detail_search","库存详情查询的API编码")
+    ERP_INVENTORY_ANALYSIS_PROMPT_CODE = ("erp_inventory_analysis_prompt","库存分析提示的API编码")
 
     JXM_API_CODE = ("jixiaomei","极小妹接口的API编码")
 

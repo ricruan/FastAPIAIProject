@@ -4,8 +4,10 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel,Field
 from sqlmodel import Session
 
+from src.ai.aiService import get_inventory_analysis_prompt, inventory_analysis
 from src.common.enum.codeEnum import CodeEnum
 from src.db.db import get_db
+from src.exception.aiException import AIException
 from src.myHttp.bo.httpResponse import HttpResponse
 from src.service.aiCodeService import get_code_value_by_code
 from src.service.erpService import erp_execute_sql, erp_generate_popi, erp_order_search, erp_inventory_detail_search, \
@@ -55,3 +57,13 @@ async def order_search(data: ERPOrderSearch, db: Session = Depends(get_db)):
 async def order_search(data: ERPInventoryDetailSearch, db: Session = Depends(get_db)):
     response = await erp_inventory_detail_search_by_cn(data.model_dump(), db)
     return HttpResponse.success(response)
+
+@router.post("/inventory_detail_analysis")
+async def order_search(data: ERPInventoryDetailSearch, db: Session = Depends(get_db)):
+    response = await erp_inventory_detail_search_by_cn(data.model_dump(), db)
+    prompt_text = get_code_value_by_code(session=db ,code_value = CodeEnum.ERP_INVENTORY_ANALYSIS_PROMPT_CODE.value)
+    if not prompt_text:
+        raise AIException("库存分析的提示词未获取到" + CodeEnum.ERP_INVENTORY_ANALYSIS_PROMPT_CODE.value)
+
+    data = await inventory_analysis(response, prompt_text)
+    return HttpResponse.success(data)
