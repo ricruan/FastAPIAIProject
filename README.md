@@ -71,9 +71,9 @@ PostgreSQL 数据存储在名为 `postgres_data` 的 Docker 卷中，确保数�
 所有服务都连接到名为 `fastapi_network` 的 Docker 网络，允许它们相互通信。
 
 ## 笔记
-docker build -t stone-ai:0.1.3 .
-docker save -o stone-ai-0.1.3.tar stone-ai:0.1.3
-DATABASE_URL=root:root@172.17.0.2:3306/stone_ai_db?charset=utf8mb4
+docker build -t stone-ai:0.1.4 .
+docker save -o stone-ai-0.1.4.tar stone-ai:0.1.4
+DATABASE_URL=root:a3f5c8e1d7b90246@172.17.0.2:3306/stone_ai_db?charset=utf8mb4
 
 
 重载ng

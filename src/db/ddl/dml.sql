@@ -14,6 +14,9 @@ VALUES('d1d2c3y6s6c-1d9e-4b6f-a8c3-7b5d2e6f4a1c', 'erp', 'erp_order_search', '�
 INSERT INTO stone_ai_db.api_info
 (id, type_code, api_code, api_name, api_url, api_header, api_desc, api_param_struct, api_param_desc, api_param_template, create_time, update_time)
 VALUES('k1c2x3q36sc-1d9e-4b6f-a8c3-7b5d2e6f4a1c', 'erp', 'erp_inventory_detail_search', '库存详情查询接口', 'https://pmserp.toasin.cn/api/inventory/get_stock_details', '', 'ERP系统生成库存详情查询的接口', NULL, NULL, NULL, '2025-06-23 03:21:57', '2025-06-23 03:27:30');
+INSERT INTO stone_ai_db.api_info
+(id, type_code, api_code, api_name, api_url, api_header, api_desc, api_param_struct, api_param_desc, api_param_template, create_time, update_time)
+VALUES('cd386762-a3d8-4390-a430-13e54b88d0a1', 'func', 'datetime_to_timestamp', '时间转Unix时间戳函数', '', NULL, '将给定的日期时间和时区偏移转换为Unix时间戳（秒级）', '[{"year": "2024", "month": "1","day": "1"},{"year": "2024", "month": "2","day": "1"}]', 'year (int): 年份，如2025', '输入：2025年6月13日张三的销售额是多少', '2025-07-09 10:22:47', '2025-07-09 10:22:47');
 
 
 INSERT INTO stone_ai_db.code

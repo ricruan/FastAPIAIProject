@@ -3,10 +3,36 @@ import sys
 import time
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+def get_log_level_from_env():
+    """
+    从环境变量中获取日志级别设置
+    
+    Returns:
+        int: 日志级别对应的数值
+    """
+    # 从环境变量获取日志级别，默认为INFO
+    log_level_str = os.getenv('LOG_LEVEL', 'INFO').upper()
+    
+    # 日志级别映射
+    log_levels = {
+        'DEBUG': logging.DEBUG,
+        'INFO': logging.INFO,
+        'WARNING': logging.WARNING,
+        'ERROR': logging.ERROR,
+        'CRITICAL': logging.CRITICAL
+    }
+    
+    # 返回对应的日志级别，如果环境变量值无效则默认使用INFO
+    return log_levels.get(log_level_str, logging.INFO)
 
 def setup_logging():
     """
-    配置日志系统，按天生成日志文件
+    配置日志系统，按天生成日志文件，日志级别从环境变量中获取
     """
     # 创建logs目录（如果不存在）
     log_dir = Path("logs")
@@ -18,9 +44,12 @@ def setup_logging():
         datefmt='%Y-%m-%d %H:%M:%S'
     )
 
+    # 从环境变量获取日志级别
+    log_level = get_log_level_from_env()
+    
     # 创建根日志记录器
     root_logger = logging.getLogger()
-    root_logger.setLevel(logging.INFO)
+    root_logger.setLevel(log_level)
 
     # 添加控制台处理器
     console_handler = logging.StreamHandler(sys.stdout)
@@ -59,5 +88,9 @@ def setup_logging():
     error_file_handler.setLevel(logging.ERROR)
     root_logger.addHandler(error_file_handler)
     
-    logging.info(f"日志系统初始化完成，常规日志文件将保存在: {log_file_path}")
+    # 获取日志级别的名称
+    level_name = logging.getLevelName(log_level)
+    
+    logging.info(f"日志系统初始化完成，日志级别设置为: {level_name}")
+    logging.info(f"常规日志文件将保存在: {log_file_path}")
     logging.info(f"错误日志文件将保存在: {error_log_file_path}")

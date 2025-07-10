@@ -17,7 +17,8 @@ logger = logging.getLogger(__name__)
 
 # 先初始化日志 再导入其他模块
 from fastapi import FastAPI
-from .controller.ai import apiInfoController, sessionController, sessionDetailController, aiCodeController
+from .controller.ai import apiInfoController, sessionController, sessionDetailController, aiCodeController, \
+    testController
 from .controller.erp import erpController
 from .controller.dify import difyController
 from .db.db import create_tables
@@ -30,12 +31,14 @@ create_tables()
 
 app = FastAPI(docs_url=None, redoc_url=None)  # 禁用默认的 docs 和 redoc
 
+# todo 搞成自动注册路由
 app.include_router(apiInfoController.router)
 app.include_router(erpController.router)
 app.include_router(difyController.router)
 app.include_router(sessionController.router)
 app.include_router(sessionDetailController.router)
 app.include_router(aiCodeController.router)
+app.include_router(testController.router)
 
 
 

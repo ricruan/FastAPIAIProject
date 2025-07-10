@@ -2,8 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 from typing import Dict, Any, List
 from src.db.db import get_db
+from src.exception.aiException import AIException
 from src.pojo.po.apiInfoPo import APIInfo
-from src.dao.apiInfoDao import get_info_by_api_code,get_info_by_type_code, create_api_info, search_api_info # 获取数据库会话
+from src.dao.apiInfoDao import get_info_by_api_code, get_info_by_type_code, create_api_info, search_api_info, \
+    get_info_by_api_code_no_check
 from src.pojo.vo.apiInfoVo import APIInfoCreate
 from src.myHttp.bo.httpResponse import HttpResponse, HttpResponseModel
 from src.service.apiInfoService import get_api_info_4_task_classify, api_info_2_struct_str
@@ -18,8 +20,7 @@ async def get_api_info_by_api_code(api_code: str, db: Session = Depends(get_db))
     :param db: db
     :return:  查询结果
     """
-    api_info = get_info_by_api_code(db, api_code)
-    api_info = api_info_2_struct_str(api_info)
+    api_info = api_info_2_struct_str(db, api_code)
     return HttpResponse.success(api_info)
 
 @router.get("/type/{type_code}", response_model=HttpResponseModel[List[Dict[str, Any]]])
@@ -30,8 +31,7 @@ async def get_api_info_by_type_code(type_code: str, db: Session = Depends(get_db
     :param db: db
     :return:  查询结果
     """
-    api_info = get_info_by_type_code(db, type_code)
-    data = get_api_info_4_task_classify(api_info)
+    data = get_api_info_4_task_classify(db, type_code)
     return HttpResponse.success(data)
 
 @router.post("/", response_model=HttpResponseModel[APIInfo])
@@ -43,12 +43,9 @@ async def create_api_info_endpoint(api_info_data: APIInfoCreate, db: Session = D
     :return:  反显数据
     """
     # 检查API编码是否已存在
-    existing_api_info = get_info_by_api_code(db, api_info_data.api_code)
+    existing_api_info = get_info_by_api_code_no_check(db, api_info_data.api_code)
     if existing_api_info:
-        raise HTTPException(
-            status_code=400,
-            detail=f"API with code {api_info_data.api_code} already exists"
-        )
+        raise AIException.quick_raise( f"API编码{api_info_data.api_code}已存在")
     
     # 创建APIInfo对象
     api_info = api_info_data.to_po()

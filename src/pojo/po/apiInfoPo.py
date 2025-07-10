@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, ClassVar, List
 from sqlmodel import SQLModel, Field, Index, text
-
+from sqlalchemy import Text
 
 
 class APIInfo(SQLModel, table=True):
@@ -33,7 +33,7 @@ class APIInfo(SQLModel, table=True):
         sa_column_kwargs={"comment": "唯一标识"}
     )
 
-    type_code: str = Field(
+    type_code: Optional[str] = Field(
         max_length=64,
         description="API类型编码",
         sa_column_kwargs={"comment": "API类型编码"}
@@ -52,20 +52,20 @@ class APIInfo(SQLModel, table=True):
         sa_column_kwargs={"comment": "API名称"}
     )
 
-    api_url: str = Field(
+    api_url: Optional[str] = Field(
         max_length=512,
         description="API请求地址",
         sa_column_kwargs={"comment": "API请求地址"}
     )
 
-    api_header: str = Field(
-        max_length=512,
+    api_header: Optional[str] = Field(
+        sa_type=Text,
         description="API请求头",
         sa_column_kwargs={"comment": "API请求头"}
     )
 
-    api_desc: str = Field(
-        max_length=512,
+    api_desc: Optional[str] = Field(
+        sa_type=Text,
         description="API请求地址",
         sa_column_kwargs={"comment": "API描述"}
     )
@@ -73,18 +73,21 @@ class APIInfo(SQLModel, table=True):
 
     api_param_struct: Optional[str] = Field(
         default=None,
+        sa_type=Text,
         description="API参数结构",
         sa_column_kwargs={"comment": "API参数结构"}
     )
 
     api_param_desc: Optional[str] = Field(
         default=None,
+        sa_type=Text,
         description="API参数描述",
         sa_column_kwargs={"comment": "API参数描述"}
     )
 
     api_param_template: Optional[str] = Field(
         default=None,
+        sa_type=Text,
         description="API参数示例",
         sa_column_kwargs={"comment": "API参数示例"}
     )

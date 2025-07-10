@@ -13,11 +13,28 @@ def create_api_info(session: Session, api_info: APIInfo):
     return api_info
 
 def get_info_by_api_code(session: Session, api_code: str)  -> Optional[APIInfo]:
-    statement = select(APIInfo).where(APIInfo.api_code == api_code)
-    api = session.exec(statement).first()
+    """
+    带校验获取，如果没找到直接报错
+    :param session:
+    :param api_code:
+    :return:
+    """
+    api = get_info_by_api_code_no_check(session, api_code)
     if api is None:
         raise AIException.quick_raise(f"没有找到对应的API信息(api_code:{api_code})")
     return api
+
+def get_info_by_api_code_no_check(session: Session, api_code: str)  -> Optional[APIInfo]:
+    """
+    不带校验的获取
+    :param session:
+    :param api_code:
+    :return:
+    """
+    statement = select(APIInfo).where(APIInfo.api_code == api_code)
+    api = session.exec(statement).first()
+    return api
+
 
 def get_info_by_type_code(session: Session, type_code: str)  -> Optional[Sequence[APIInfo]]:
     statement = select(APIInfo).where(APIInfo.type_code == type_code)
