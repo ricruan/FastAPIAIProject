@@ -19,6 +19,7 @@ async def get_qwen_completion(
     base_url: str = os.getenv("QWEN_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1"),
     temperature: float = float(os.getenv("QWEN_TEMPERATURE", 1.0)),
     enable_search: bool = False,
+    **kwargs
 ) -> Any:
     """
     调用通义千问API获取聊天完成结果

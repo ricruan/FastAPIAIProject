@@ -1,20 +1,12 @@
+import json
 
-from openai import OpenAI
-# sk-10dcce94da9c4c33b9dd6f709678c65e
-#
-client = OpenAI(api_key="sk-646171ae9662439cbc8d41da59188e2a", base_url="https://api.deepseek.com")
+s = "{\"code\":200,\"data\":[{\"category_id\":96120,\"category_name\":\"集成电路\",\"total_amount\":70000,\"order_count\":1},{\"category_id\":95967,\"category_name\":\"中央处理器\",\"total_amount\":160,\"order_count\":1}],\"msg\":\"success\"}"
 
-# noinspection PyTypeChecker
-response = client.chat.completions.create(
-    model="deepseek-chat",
-    messages=[
-        {"role": "system", "content": "You are a helpful assistant"},
-        {"role": "user", "content": "你好，你是谁"},
-    ],
-    stream=True
-)
 
-for chunk in response:
-    # chunk 是一个 `ChatCompletionChunk` 对象
-    if chunk.choices[0].delta.content is not None:
-        print(chunk, end="\n", flush=True)  # 实时打印内容
+def main(sql_data) -> dict:
+    json_data = json.loads(sql_data)
+    if len(json_data["data"]) > 0:
+        return {"result": {"type": "data", "data": json_data["data"]}}
+    else:
+        return {"result": {"type": "text", "data": "未查询到数据"}}
+print(main(s))

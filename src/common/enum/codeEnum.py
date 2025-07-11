@@ -9,6 +9,8 @@ class CodeEnum(Enum):
     ERP_INVENTORY_ANALYSIS_PROMPT_CODE = ("erp_inventory_analysis_prompt","库存分析提示的API编码")
     JSON_STRUCTURE_EXTRACTION_PROMPT_CODE = ("json_structure_extraction","JSON结构化提取的提示词编码")
     DATETIME_TO_TIMESTAMP_FUNC_CODE = ("datetime_to_timestamp","日期时间转时间戳的函数编码")
+    ERP_USER_SALE_INFO_API_CODE = ("erp_user_sale_info","ERP用户销售信息查询的API编码")
+    ERP_SELLER_WORK_ANALYSIS_PROMPT_CODE = ("erp_seller_work_analysis_prompt","ERP销售工作分析的提示词编码")
 
     JXM_API_CODE = ("jixiaomei","极小妹接口的API编码")
 

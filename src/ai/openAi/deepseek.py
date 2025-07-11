@@ -18,6 +18,7 @@ async def get_deepseek_completion(
     api_key: str = os.getenv("DEEPSEEK_API_KEY", ""),
     base_url: str = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com"),
     temperature: float = float(os.getenv("DEEPSEEK_TEMPERATURE", 1.0)),
+    **kwargs
 ) -> Any:
     """
     调用 Deepseek API 获取聊天完成结果

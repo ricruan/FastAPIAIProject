@@ -7,36 +7,37 @@ from src.ai.openAi.qwen import get_qwen_completion
 from src.ai.pojo.promptBo import PromptContent
 from src.common.enum.codeEnum import CodeEnum
 from src.db.db import get_db, engine
+from src.exception.aiException import AIException
+from src.pojo.bo.aiBo import GetJsonModel, NormalLLMRequestModel, ModelConfig
 from src.service.aiCodeService import get_code_value_by_code
 from src.service.apiInfoService import api_info_2_struct_str
 from src.utils.dateUtils import get_now_4_prompt
 
 logger = logging.getLogger(__name__)
 
-def get_inventory_analysis_prompt(data,prompt_text:str) -> list[dict]:
-    prompt_template = Template(prompt_text)
-    prompt = prompt_template.substitute(data=data)
-    messages = [PromptContent.as_system(prompt).model_dump(), PromptContent.as_user("基于我提供的数据,帮我进行库存分析. 以下是我提供的数据:\n" + str(data)).model_dump()]
-    return messages
 
 
-async def do_api_2_llm(prams: dict, model: str) -> str:
+
+async def do_api_2_llm(llm_prams: ModelConfig) -> str:
     """
     根据model入参自动选择调用模型类型
-    :param prams: 模型配置参数及messages,messages必传
-    :param model: 模型类型 目前仅支持 ds qwen
+    :param llm_prams: 模型配置参数及messages,messages必传
     :return:
     """
-    if model == "deepseek":
-        response = await get_deepseek_completion(**prams)
+    if llm_prams.messages is None:
+        raise AIException("messages is required")
 
-    elif model == "qwen":
-        response = await get_qwen_completion(**prams)
+
+    if "deepseek" in llm_prams.model:
+        response = await get_deepseek_completion(**llm_prams.model_dump())
+
+    elif "qwen" in llm_prams.model:
+        response = await get_qwen_completion(**llm_prams.model_dump())
 
     else:
-        response = await get_deepseek_completion(**prams)
+        response = await get_deepseek_completion(**llm_prams.model_dump())
 
-    if "stream" in prams and bool(prams["stream"]) == True:
+    if llm_prams.stream:
         result = response
     else:
         result = handle_ds_response_block(response)
@@ -66,18 +67,28 @@ async def sse_event_generator(response):
         yield f"event: error\ndata: {str(e)}\n\n"
 
 
-async def inventory_analysis(data,prompt_text:str,model: str,stream: bool = True) -> str:
+
+async def normal_json_structure_extraction(query: str,model: str,structure: str):
     """
-    库存详情分析，根据库存详情数据进行库存分析
-    :param stream: 流式输出？
-    :param data: 库存详情数据
-    :param prompt_text: 提示词
+    通用JSON结构提取
+    :param query: 用户输入
     :param model: 调用模型
-    :return: 分析结果
+    :param structure: JSON结构信息
+    :return: LLM提取到的结果
     """
-    messages = get_inventory_analysis_prompt(data,prompt_text)
-    result = await do_api_2_llm({"messages": messages,"stream": stream},model)
-    return result
+    with Session(engine) as db:
+        prompt_text = get_code_value_by_code(session=db, code_value=CodeEnum.JSON_STRUCTURE_EXTRACTION_PROMPT_CODE.value)
+        date_info = get_now_4_prompt()
+        prompt_template = Template(prompt_text)
+        prompt = prompt_template.substitute(struct=structure,date_info=date_info)
+        messages = [PromptContent.as_system(prompt), PromptContent.as_user(query)]
+        result = await do_api_2_llm(ModelConfig(model=model, messages=messages, stream=False))
+        return result
+
+async def easy_json_structure_extraction(params :GetJsonModel):
+    with Session(engine) as db:
+        struct = api_info_2_struct_str(session=db, api_code=params.api_code)
+        return await normal_json_structure_extraction(params.query, params.model, struct)
 
 
 async def get_time_range(query: str,model: str):
@@ -87,12 +98,5 @@ async def get_time_range(query: str,model: str):
     :param model: 调用模型
     :return: 一个数组，第一个dict是开始时间，第二个dict是结束时间
     """
-    with Session(engine) as db:
-        prompt_text = get_code_value_by_code(session=db, code_value=CodeEnum.JSON_STRUCTURE_EXTRACTION_PROMPT_CODE.value)
-        struct = api_info_2_struct_str(session=db, api_code=CodeEnum.DATETIME_TO_TIMESTAMP_FUNC_CODE.value)
-        date_info = get_now_4_prompt()
-        prompt_template = Template(prompt_text)
-        prompt = prompt_template.substitute(struct=struct,date_info=date_info)
-        messages = [PromptContent.as_system(prompt).model_dump(), PromptContent.as_user(query).model_dump()]
-        result = await do_api_2_llm({"messages": messages},model)
-        return result
+    params = GetJsonModel(query=query, model=model, api_code=CodeEnum.DATETIME_TO_TIMESTAMP_FUNC_CODE.value)
+    return easy_json_structure_extraction(params)

@@ -1,12 +1,15 @@
 import copy
 import logging
-
+from string import Template
+from src.ai.aiService import do_api_2_llm
+from src.ai.pojo.promptBo import PromptContent
 from src.common.enum.codeEnum import CodeEnum
 from src.dao.apiInfoDao import get_info_by_api_code
 from src.exception.aiException import AIException
 from src.myHttp.utils.myHttpUtils import normal_post, post_with_query_params, form_data_post
 from sqlmodel import Session
 
+from src.pojo.bo.aiBo import NormalLLMRequestModel
 from src.service.aiCodeService import get_code_value_by_code
 from src.utils.dataUtils import translate_dict_keys_4_list, translate_dict_keys_4_dict
 
@@ -51,6 +54,20 @@ async def erp_order_search(data: dict, session: Session):
     response = await form_data_post(api_info.api_url, form_data=data, headers={"token": data['token']})
     erp_response_check(response)
     return get_data_from_erp_page_response(response)
+
+async def erp_user_sale_info(data: dict, session: Session):
+    """
+    订单查询
+    :param data:
+    :param session:
+    :return:
+    """
+    api_info = get_info_by_api_code(session,CodeEnum.ERP_USER_SALE_INFO_API_CODE.value)
+    response = await form_data_post(api_info.api_url, form_data=data, headers={"token": data['token']})
+    erp_response_check(response)
+    if isinstance(response['data'],list):
+        return response['data']
+    return list(response['data'].values())
 
 async def erp_inventory_detail_search(data: dict, session: Session):
     """
@@ -99,3 +116,38 @@ def erp_response_check(response):
     """
     if response['code'] not in [1,0] :
         raise AIException(f"ERP接口异常:{response['msg']}")
+
+def get_inventory_analysis_prompt(data,prompt_text:str) -> list[dict]:
+    prompt_template = Template(prompt_text)
+    prompt = prompt_template.substitute(data=data)
+    messages = [PromptContent.as_system(prompt),
+                PromptContent.as_user("基于我提供的数据,帮我进行库存分析. 以下是我提供的数据:\n" + str(data))]
+    return messages
+
+async def inventory_analysis(data,prompt_text:str,model: str,stream: bool = True) -> str:
+    """
+    库存详情分析，根据库存详情数据进行库存分析
+    :param stream: 流式输出？
+    :param data: 库存详情数据
+    :param prompt_text: 提示词
+    :param model: 调用模型
+    :return: 分析结果
+    """
+    messages = get_inventory_analysis_prompt(data,prompt_text)
+
+    result = await do_api_2_llm(NormalLLMRequestModel(model=model, messages=messages, stream=stream))
+    return result
+
+async def erp_seller_sale_info_analysis(llm_params: NormalLLMRequestModel,sale_data: str, session: Session):
+    """
+    销售人员销售情况分析
+    :param llm_params: LLM的擦拭农户
+    :param sale_data:销售数据
+    :param session:
+    :return:
+    """
+    prompt_text = get_code_value_by_code(session=session, code_value=CodeEnum.ERP_SELLER_WORK_ANALYSIS_PROMPT_CODE.value)
+    llm_params.messages = [PromptContent.as_system(prompt_text),
+                                            PromptContent.as_user(llm_params.query),
+                                            PromptContent.as_assistant(sale_data)]
+    return await do_api_2_llm(llm_params)
