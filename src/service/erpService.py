@@ -9,7 +9,7 @@ from src.exception.aiException import AIException
 from src.myHttp.utils.myHttpUtils import normal_post, post_with_query_params, form_data_post
 from sqlmodel import Session
 
-from src.pojo.bo.aiBo import NormalLLMRequestModel
+from src.pojo.bo.aiBo import NormalLLMRequestModel, ModelConfig
 from src.service.aiCodeService import get_code_value_by_code
 from src.utils.dataUtils import translate_dict_keys_4_list, translate_dict_keys_4_dict
 
@@ -135,7 +135,7 @@ async def inventory_analysis(data,prompt_text:str,model: str,stream: bool = True
     """
     messages = get_inventory_analysis_prompt(data,prompt_text)
 
-    result = await do_api_2_llm(NormalLLMRequestModel(model=model, messages=messages, stream=stream))
+    result = await do_api_2_llm(ModelConfig(model=model, messages=messages, stream=stream))
     return result
 
 async def erp_seller_sale_info_analysis(llm_params: NormalLLMRequestModel,sale_data: str, session: Session):
