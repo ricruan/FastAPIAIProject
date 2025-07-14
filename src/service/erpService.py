@@ -62,10 +62,20 @@ async def erp_order_search(data: dict, session: Session):
     :param session:
     :return:
     """
-    api_info = get_info_by_api_code(session,CodeEnum.ERP_ORDER_SEARCH_API_CODE.value)
-    response = await form_data_post(api_info.api_url, form_data=data, headers={"token": data['token']})
+    response = await erp_order_search_without_check(data, session)
     erp_response_check(response)
     return get_data_from_erp_page_response(response)
+
+async def erp_order_search_without_check(data: dict, session: Session):
+    """
+    订单查询 不带校验
+    :param data:
+    :param session:
+    :return:
+    """
+    api_info = get_info_by_api_code(session,CodeEnum.ERP_ORDER_SEARCH_API_CODE.value)
+    response = await form_data_post(api_info.api_url, form_data=data, headers={"token": data['token']})
+    return response
 
 async def erp_user_sale_info(data: dict, session: Session):
     """

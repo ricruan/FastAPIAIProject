@@ -13,7 +13,7 @@ from src.pojo.bo.aiBo import GetJsonModel
 from src.service.aiCodeService import get_code_value_by_code
 from src.service.erpService import erp_execute_sql, erp_generate_popi, erp_order_search, \
     erp_inventory_detail_search_by_cn, erp_user_sale_info, inventory_analysis, erp_seller_sale_info_analysis, \
-    erp_generate_pi
+    erp_generate_pi, erp_order_search_without_check
 from src.utils.dataUtils import translate_dict_keys_4_list
 
 router = APIRouter(prefix="/erp", tags=["ERP 相关"])
@@ -42,6 +42,14 @@ async def order_search(data: ERPOrderSearch, db: Session = Depends(get_db)):
     response = await erp_order_search(data.model_dump(), db)
     result = translate_dict_keys_4_list(response, get_code_value_by_code(db, CodeEnum.ORDER_SEARCH_MAPPING.value))
     return HttpResponse.success(result)
+
+@router.post("/token_check")
+async def login_check(data: dict, db: Session = Depends(get_db)):
+    params = ERPOrderSearch(token=data.get("token"))
+    response = await erp_order_search_without_check(params.model_dump(), db)
+    if 'token' in response['msg']:
+        return HttpResponse.error(response['msg'])
+    return HttpResponse.success("token有效")
 
 
 @router.post("/inventory_detail")

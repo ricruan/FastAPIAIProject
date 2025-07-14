@@ -11,8 +11,8 @@ class SQLQuery(BaseModel):
     sql: str
 
 class ERPOrderSearch(TokenModel):
-    client: str = Field(..., description="客户名称", example="中盛")
-    seller: str = Field(..., description="销售名称", example="张三")
+    client: str = Field("", description="客户名称", example="中盛")
+    seller: str = Field("", description="销售名称", example="张三")
     page: str = Field("1", description="页码（默认1，从1开始）", example="1")
     pagesize: str = Field("10", description="每页条数（默认10，如10/20/50）", example="10")
 
