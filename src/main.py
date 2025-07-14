@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 # 先初始化日志 再导入其他模块
 from fastapi import FastAPI
 from .controller.ai import apiInfoController, sessionController, sessionDetailController, aiCodeController, \
-    testController
+    testController, commonController
 from .controller.erp import erpController
 from .controller.dify import difyController
 from .db.db import create_tables
@@ -39,6 +39,7 @@ app.include_router(sessionController.router)
 app.include_router(sessionDetailController.router)
 app.include_router(aiCodeController.router)
 app.include_router(testController.router)
+app.include_router(commonController.router)
 
 
 

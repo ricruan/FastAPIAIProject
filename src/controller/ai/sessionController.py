@@ -5,7 +5,7 @@ from datetime import datetime
 import uuid
 
 from src.db.db import get_db
-from src.pojo.po.sessionPo import Session as SessionModel, SessionInfo
+from src.pojo.po.sessionPo import SessionPo as SessionModel, SessionInfo
 from src.dao.sessionDao import (
     create_session, 
     get_session_by_id, 

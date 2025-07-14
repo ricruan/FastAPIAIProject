@@ -1,3 +1,5 @@
+from string import Template
+
 from pydantic import BaseModel
 
 from src.ai.enum.aiEnum import AIPromptRole
@@ -18,3 +20,13 @@ class PromptContent(BaseModel):
     @classmethod
     def as_assistant(cls,content:str):
         return cls(role=AIPromptRole.ASSISTANT.value,content=content)
+
+    @classmethod
+    def to_messages(cls, prompt: str, query: str):
+        return [cls.as_system(prompt), cls.as_user(query)]
+
+
+    def template_handle(self,variable:dict):
+        template =  Template(self.content)
+        self.content = template.substitute(**variable)
+        return self

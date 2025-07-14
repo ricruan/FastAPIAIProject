@@ -25,7 +25,7 @@ async def do_api_2_llm(llm_prams: ModelConfig) -> str:
     :return:
     """
     if llm_prams.messages is None:
-        raise AIException("messages is required")
+        raise AIException.quick_raise("messages is required")
 
 
     if "deepseek" in llm_prams.model:

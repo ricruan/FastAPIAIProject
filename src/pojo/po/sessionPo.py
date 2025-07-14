@@ -78,7 +78,7 @@ class SessionFieldsMixin:
     )
 
 
-class Session(SessionFieldsMixin, SQLModel, table=True):
+class SessionPo(SessionFieldsMixin, SQLModel, table=True):
     """
     会话表模型
     """
@@ -99,7 +99,7 @@ class Session(SessionFieldsMixin, SQLModel, table=True):
         ]
 
     @classmethod
-    def get_default(cls) -> "Session":
+    def get_default(cls) -> "SessionPo":
         """
         获取默认实例
         :return:

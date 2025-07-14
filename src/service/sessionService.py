@@ -6,7 +6,7 @@ from typing import Optional, Dict, Any, List
 from src.dao.sessionDao import create_session, get_recent_sessions, get_session_by_id, update_session
 from src.dao.sessionDetailDao import get_session_details_by_session_id
 from src.exception.aiException import AIException
-from src.pojo.po.sessionPo import Session as SessionModel, SessionInfo
+from src.pojo.po.sessionPo import SessionPo as SessionModel, SessionInfo
 
 
 def create_session_default(session: Session,user_id: str = None , token: str = None):

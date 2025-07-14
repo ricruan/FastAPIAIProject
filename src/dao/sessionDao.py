@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlmodel import Session, select, delete, update, desc
 from sqlalchemy.orm import joinedload
 
-from src.pojo.po.sessionPo import Session as SessionModel
+from src.pojo.po.sessionPo import SessionPo as SessionModel
 from src.pojo.po.sessionDetailPo import SessionDetail
 
 def create_session(session: Session, session_model: SessionModel) -> SessionModel:

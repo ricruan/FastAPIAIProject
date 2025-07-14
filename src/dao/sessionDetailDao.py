@@ -68,7 +68,7 @@ def get_session_details_by_session_id(session: Session, session_id: str) -> Sequ
     results = session.exec(statement).all()
     return results
 
-def search_session_details(session: Session, search_params: Dict[str, Any]) -> Sequence[SessionDetail]:
+def search_session_details(session: Session, search_params: Dict[str, Any],limit: int | None = None) -> Sequence[SessionDetail]:
     """
     根据提供的参数搜索会话详情，使用SessionDetail中定义的like_search_fields
     来决定查询方式
@@ -76,7 +76,7 @@ def search_session_details(session: Session, search_params: Dict[str, Any]) -> S
     Args:
         session: 数据库会话
         search_params: 搜索参数字典，键为SessionDetail的字段名，值为搜索条件
-
+        limit: 搜索结果数量限制
     Returns:
         符合条件的SessionDetail列表
     """
@@ -96,7 +96,7 @@ def search_session_details(session: Session, search_params: Dict[str, Any]) -> S
                 statement = statement.where(getattr(SessionDetail, field) == value)
 
     # 执行查询
-    results = session.exec(statement).all()
+    results = session.exec(statement.order_by(SessionDetail.create_time.desc()).limit(limit)).all()
     return results
 
 def update_session_detail(session: Session, detail_id: str, update_data: Dict[str, Any]) -> Optional[SessionDetail]:
