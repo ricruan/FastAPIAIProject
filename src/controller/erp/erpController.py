@@ -12,7 +12,8 @@ from src.myHttp.bo.httpResponse import HttpResponse
 from src.pojo.bo.aiBo import GetJsonModel
 from src.service.aiCodeService import get_code_value_by_code
 from src.service.erpService import erp_execute_sql, erp_generate_popi, erp_order_search, \
-    erp_inventory_detail_search_by_cn, erp_user_sale_info, inventory_analysis, erp_seller_sale_info_analysis
+    erp_inventory_detail_search_by_cn, erp_user_sale_info, inventory_analysis, erp_seller_sale_info_analysis, \
+    erp_generate_pi
 from src.utils.dataUtils import translate_dict_keys_4_list
 
 router = APIRouter(prefix="/erp", tags=["ERP 相关"])
@@ -29,6 +30,11 @@ async def execute_sql_query(sql: SQLQuery, db: Session = Depends(get_db)):
 @router.post("/generate_popi")
 async def generate_po_pi(data: dict, db: Session = Depends(get_db)):
     response = await erp_generate_popi(data, db)
+    return HttpResponse.success(response)
+
+@router.post("/generate_pi")
+async def generate_po_pi(data: dict, db: Session = Depends(get_db)):
+    response = await erp_generate_pi(data, db)
     return HttpResponse.success(response)
 
 @router.post("/order_search")

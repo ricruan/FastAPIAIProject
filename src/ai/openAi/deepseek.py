@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from openai import OpenAI, AsyncOpenAI
+from openai import AsyncOpenAI
 from typing import List, Dict, Any
 from openai.types.chat import ChatCompletion
 from dotenv import load_dotenv
@@ -57,7 +57,7 @@ def handle_ds_response_block(response: ChatCompletion) -> str:
     logger.info(f"LLM 最终返回结果:\n {result}")
     return result
 
-# 示例用法
+
 if __name__ == "__main__":
     example_messages = [
         {"role": "system", "content": "You are a helpful assistant"},

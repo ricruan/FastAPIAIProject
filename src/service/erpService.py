@@ -42,6 +42,18 @@ async def erp_generate_popi(data: dict, session: Session):
     erp_response_check(response)
     return response['data']
 
+async def erp_generate_pi(data: dict, session: Session):
+    """
+    生成PI
+    :param data:
+    :param session:
+    :return:
+    """
+    api_info = get_info_by_api_code(session,CodeEnum.ERP_GEN_PI_API_CODE.value)
+    response = await form_data_post(api_info.api_url, form_data=data, headers=data)
+    erp_response_check(response)
+    return response['data']
+
 
 async def erp_order_search(data: dict, session: Session):
     """
@@ -115,7 +127,7 @@ def erp_response_check(response):
     :return: 无
     """
     if response['code'] not in [1,0] :
-        raise AIException(f"ERP接口异常:{response['msg']}")
+        raise AIException.quick_raise(f"ERP接口异常:{response['msg']}")
 
 def get_inventory_analysis_prompt(data,prompt_text:str) -> list[dict]:
     prompt_template = Template(prompt_text)
