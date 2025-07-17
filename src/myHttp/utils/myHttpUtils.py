@@ -5,7 +5,8 @@ from asyncio import Event
 
 import aiohttp
 from src.exception.aiException import AIException
-from src.utils.difyUtils import dify_stream_response_handler, dify_get_conversation_id_from_stream
+from src.utils.difyUtils import dify_stream_response_handler, dify_get_conversation_id_from_stream, \
+    get_value_from_stream_response_by_key
 
 # 请求头
 HEADERS = {
@@ -156,6 +157,8 @@ async def stream_post_and_enqueue(message_queue, api_url: str, api_param: dict, 
                 # 解码字节数据为字符串
                 chunk = line.decode('utf-8').strip()
                 logger.debug(f"流式请求Dify接口的响应数据:{chunk}")
+                if get_value_from_stream_response_by_key(chunk,'event') == 'error':
+                    result = 'dify error,'+ get_value_from_stream_response_by_key(chunk,'message') + ","
                 result = result + dify_stream_response_handler(chunk)
                 if conversation_id is None:
                     conversation_id = dify_get_conversation_id_from_stream(chunk)

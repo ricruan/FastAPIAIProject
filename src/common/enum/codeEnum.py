@@ -13,6 +13,7 @@ class CodeEnum(Enum):
     ERP_SELLER_WORK_ANALYSIS_PROMPT_CODE = ("erp_seller_work_analysis_prompt","ERP销售工作分析的提示词编码")
     ERP_GEN_PI_API_CODE = ("erp_generate_pi","生成PI的API编码")
     QUESTION_RECOMMEND_PROMPT_CODE = ("question_recommend_prompt","问题推荐提示的API编码")
+    UP_LANGUAGE_STYLE_ANALYSIS_PROMPT_CODE = ("up_language_style_analysis_prompt","UP语言风格分析的提示词编码")
 
     JXM_API_CODE = ("jixiaomei","极小妹接口的API编码")
 

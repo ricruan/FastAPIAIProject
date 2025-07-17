@@ -12,12 +12,14 @@ from src.db.db import get_db
 from src.exception.aiException import AIException
 from src.myHttp.bo.httpResponse import HttpResponse
 from src.myHttp.utils.myHttpUtils import normal_post, stream_post_and_enqueue
-from src.pojo.po.sessionDetailPo import SessionDetail
+from src.pojo.po.sessionDetailPo import SessionDetail, DialogCarrierEnum
 from src.pojo.vo.jixiaomeiVo import DifyJxm
 from src.service.difyService import dify_result_handler, NO_DATA_RESPONSE, answer_handler
 from src.service.sessionService import get_user_last_session
 from fastapi.responses import StreamingResponse
 import asyncio
+
+from src.service.userProfileService import check_new_user
 from src.utils.dataUtils import is_valid_json
 
 router = APIRouter(prefix="/dify", tags=["DIFY 相关"])
@@ -29,6 +31,7 @@ logger = logging.getLogger(__name__)
 
 @router.post("/chatflow-jxm")
 async def chatflow_jxm(param: DifyJxm, db: Session = Depends(get_db)):
+    stream_post_task = None
     api_code = CodeEnum.JXM_API_CODE.value
     api_info =get_info_by_api_code(session=db, api_code=api_code)
     api_url = api_info.api_url
@@ -55,6 +58,7 @@ async def chatflow_jxm(param: DifyJxm, db: Session = Depends(get_db)):
         """
         nonlocal dify_response
         nonlocal result
+        nonlocal param
         if param.response_mode == "streaming":
             dify_response = await stream_post_task
             result = dify_response.get("result")
@@ -64,7 +68,14 @@ async def chatflow_jxm(param: DifyJxm, db: Session = Depends(get_db)):
             ai_session.dify_conversation_id = dify_response.get("conversation_id")
             update_session(session=db, session_id=ai_session.id, update_data=ai_session.dict())
 
-        ai_session_detail.when_success(dify_response, result)
+        if str(result.data).startswith('dify error'):
+            ai_session_detail.when_error(result)
+        else :
+            ai_session_detail.when_success(dify_response, result)
+        # 对话载体类型为 DIFY_ERP
+        ai_session_detail.dialog_carrier = DialogCarrierEnum.DIFY_ERP.value
+        # todo: 之后可以把用户缓存到内存中 读取判断， 减少一次DB访问
+        check_new_user(user_id=param.user_id, session=db, user_source=ai_session_detail.dialog_carrier)
         create_session_detail(session=db, session_detail=ai_session_detail)
 
     try:
@@ -81,7 +92,7 @@ async def chatflow_jxm(param: DifyJxm, db: Session = Depends(get_db)):
         asyncio.create_task(session_handle())
         return await do_stream_post_dify(message_queue)
     except  Exception as e:
-        ai_session_detail.when_error("问答流程异常，没有返回数据")
+        ai_session_detail.when_error("问答流程异常或没有返回数据" + str(e))
         create_session_detail(session=db, session_detail=ai_session_detail)
         logger.error(e)
         return HttpResponse.success([NO_DATA_RESPONSE])
@@ -118,7 +129,7 @@ async def do_stream_post_dify(message_queue):
         while True:
             try:
                 # 设置超时
-                data = await asyncio.wait_for(message_queue.get(), timeout=60.0)
+                data = await asyncio.wait_for(message_queue.get(), timeout=30.0)
                 logger.debug(f"SSE接收到消息: {data}")
                 if data.startswith("data: "):
                     json_str = data[6:].strip()  # 去掉前6个字符("data: ")并去除首尾空白
@@ -127,12 +138,18 @@ async def do_stream_post_dify(message_queue):
 
                 if is_valid_json(json_str):
                     json_data = json.loads(json_str)
+                    if "error" == json_data.get("event"):
+                        yield f"event: dify error "+json_data.get("message")
+                        break
+                    # 丢掉普通节点的信息，只传msg
+                    if "message" not in json_data.get("event"):
+                        continue
+                    logger.debug(f"SSE接收到message: {data}")
                     if json_data.get("event") == "message_end":
                         logger.debug("检测到结束指令，关闭SSE流")
-                        yield f"data: {json_str}\n\n"
+                        # yield f"data: {json_str}\n\n"
                         break
-                # 终止流
-                yield f"data: {json_str}\n\n"
+                    yield f"data: {json_data.get("answer")}\n\n"
 
             except asyncio.TimeoutError:
                 logger.debug("超时，关闭SSE流")

@@ -3,6 +3,8 @@ from typing import Optional, Dict, List, Any, Sequence
 from sqlmodel import Session, select, delete, update
 
 from src.pojo.po.sessionDetailPo import SessionDetail
+from src.pojo.po.sessionPo import SessionPo
+
 
 def create_session_detail(session: Session, session_detail: SessionDetail) -> SessionDetail:
     """
@@ -81,6 +83,38 @@ def search_session_details(session: Session, search_params: Dict[str, Any],limit
         符合条件的SessionDetail列表
     """
     statement = select(SessionDetail)
+
+    # 获取SessionDetail类的所有字段名
+    session_detail_fields = [column.name for column in SessionDetail.__table__.columns]
+
+    # 动态构建查询条件
+    for field, value in search_params.items():
+        if field in session_detail_fields and value is not None:
+            # 根据字段是否在like_search_fields中决定查询方式
+            if field in SessionDetail.like_search_fields and isinstance(value, str):
+                statement = statement.where(getattr(SessionDetail, field).like(f"%{value}%"))
+            else:
+                # 对于其他字段，使用精确匹配
+                statement = statement.where(getattr(SessionDetail, field) == value)
+
+    # 执行查询
+    results = session.exec(statement.order_by(SessionDetail.create_time.desc()).limit(limit)).all()
+    return results
+
+def search_session_details_by_user_id(session: Session,user_id:str, search_params: Dict[str, Any],limit: int | None = None) -> Sequence[SessionDetail]:
+    """
+    根据提供的参数搜索会话详情，使用SessionDetail中定义的like_search_fields
+    来决定查询方式
+
+    Args:
+        session: 数据库会话
+        search_params: 搜索参数字典，键为SessionDetail的字段名，值为搜索条件
+        limit: 搜索结果数量限制
+    Returns:
+        符合条件的SessionDetail列表
+        :param user_id:
+    """
+    statement = select(SessionDetail).join(SessionPo,SessionPo.id == SessionDetail.session_id).where(SessionPo.user_id == user_id)
 
     # 获取SessionDetail类的所有字段名
     session_detail_fields = [column.name for column in SessionDetail.__table__.columns]

@@ -2,12 +2,13 @@ import logging
 import uuid
 
 from fastapi.exceptions import RequestValidationError
+from fastapi.routing import APIRoute
 from starlette.responses import JSONResponse
 
 from src.utils.log_config import setup_logging
 from .exception.aiException import AIException
 from .myHttp.bo.httpResponse import HttpResponse
-from fastapi import FastAPI, Request, status, HTTPException
+from fastapi import FastAPI, Request, status, HTTPException, APIRouter
 
 # 初始化日志配置
 setup_logging()
@@ -18,7 +19,7 @@ logger = logging.getLogger(__name__)
 # 先初始化日志 再导入其他模块
 from fastapi import FastAPI
 from .controller.ai import apiInfoController, sessionController, sessionDetailController, aiCodeController, \
-    testController, commonController
+    testController, commonController, userProfileController
 from .controller.erp import erpController
 from .controller.dify import difyController
 from .db.db import create_tables
@@ -33,6 +34,7 @@ app = FastAPI(docs_url=None, redoc_url=None)  # 禁用默认的 docs 和 redoc
 
 # todo 搞成自动注册路由
 app.include_router(apiInfoController.router)
+app.include_router(userProfileController.router)
 app.include_router(erpController.router)
 app.include_router(difyController.router)
 app.include_router(sessionController.router)
@@ -65,6 +67,16 @@ async def root():
 @app.get("/hello/{name}")
 async def say_hello(name: str):
     return {"message": f"Hello {name}"}
+
+@app.on_event("startup")
+async def startup():
+    logger.info("激活路由清单如下：")
+    cnt = 0
+    for item in app.routes:
+        if isinstance(item,APIRoute):
+            cnt = cnt + 1
+            logger.info(f"Path: {item.path}, Methods: {item.methods}")
+    logger.info(f"合计 {cnt} 个接口已激活就绪")
 
 
 @app.exception_handler(AIException)

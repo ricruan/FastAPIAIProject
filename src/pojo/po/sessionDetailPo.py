@@ -1,6 +1,8 @@
 import json
+import logging
 import uuid
 from datetime import datetime
+from enum import Enum
 from typing import Optional, ClassVar, List
 
 from sqlalchemy import Text
@@ -8,8 +10,9 @@ from sqlmodel import SQLModel, Field, Index, text, ForeignKey
 
 from src.pojo.vo.difyResponse import DifyResponse
 from src.pojo.vo.jixiaomeiVo import DifyJxm
-from src.utils.dataUtils import dict_list_2_json, dict_2_json
+from src.utils.dataUtils import dict_list_2_json, dict_2_json, is_valid_json
 
+logger = logging.getLogger(__name__)
 
 class SessionDetail(SQLModel, table=True):
     """
@@ -179,6 +182,23 @@ class SessionDetail(SQLModel, table=True):
             create_time=datetime.now()
         )
 
+    def get_answer_from_fp(self):
+        """
+        从final_response中获取回答内容
+        :return:
+        """
+        try:
+            if not is_valid_json(self.final_response):
+                return None
+            json_data = json.loads(self.final_response)
+            if not isinstance(json_data, list):
+                return None
+
+            return "".join([item['data'] for item in list(json_data)])
+        except Exception as e :
+            logger.error("获取会话详情的AI回答时发生异常 \n" + e)
+            return None
+
 
 
     # 定义索引和外键约束
@@ -187,3 +207,11 @@ class SessionDetail(SQLModel, table=True):
             Index("idx_session_id", "session_id"),
             Index("idx_create_time", "create_time")
         ]
+
+
+class DialogCarrierEnum(Enum):
+    DIFY_ERP = ("dify_erp", "来源于Dify的Erp系统")
+
+    def __init__(self, value, description):
+        self._value_ = value  # 必须定义 _value_，这是枚举的实际值
+        self.description = description  # 自定义属性

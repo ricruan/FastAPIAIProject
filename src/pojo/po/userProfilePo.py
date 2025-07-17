@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from typing import Optional, ClassVar, List
 
@@ -137,6 +138,21 @@ class UserProfile(SQLModel, table=True):
         description="用户总结，基于前面的字段，总结成一段简短的文本，作为提示词给LLM",
         sa_column_kwargs={"comment": "用户总结，基于前面的字段，总结成一段简短的文本，作为提示词给LLM"}
     )
+
+    last_handle_session_id: Optional[str] = Field(
+        default=None,
+        sa_type=Text,
+        description="上一次分析截止的会话详情id",
+        sa_column_kwargs={"comment": "上一次分析截止的会话详情id"}
+    )
+
+    @classmethod
+    def get_profile(cls,user_id: str,source: str):
+        return cls(user_id = user_id,
+                   source = source,
+                   id = uuid.uuid4().hex,
+                   create_time = datetime.now(),
+                   update_time = datetime.now(),)
 
     # 定义索引
     class Config:

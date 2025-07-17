@@ -1,4 +1,5 @@
 import json
+from string import Template
 from typing import Optional
 
 from sqlmodel import Session
@@ -22,3 +23,19 @@ def get_code_value_by_code(session: Session, code_value: str) -> Optional[str | 
         return json.loads(code.value)
     else:
         return code.value
+
+
+def get_code_4_prompt(session: Session, code_value: str, variable=None) -> str:
+    """
+    直接根据code获取prompt
+    :param session:
+    :param code_value: 码值
+    :param variable: dict template变量替换字典
+    :return: 用真实值替换掉变量占位符的prompt文本
+    """
+    if variable is None:
+        variable = {}
+    prompt_text = get_code_value_by_code(session=session, code_value=code_value)
+    prompt_template = Template(prompt_text)
+    prompt = prompt_template.substitute(**variable)
+    return prompt
