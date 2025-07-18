@@ -6,6 +6,7 @@ from fastapi.routing import APIRoute
 from starlette.responses import JSONResponse
 
 from src.utils.log_config import setup_logging
+from src.utils.systemUtils import register_routers, RequestLoggingMiddleware
 from .exception.aiException import AIException
 from .myHttp.bo.httpResponse import HttpResponse
 from fastapi import FastAPI, Request, status, HTTPException, APIRouter
@@ -18,10 +19,6 @@ logger = logging.getLogger(__name__)
 
 # 先初始化日志 再导入其他模块
 from fastapi import FastAPI
-from .controller.ai import apiInfoController, sessionController, sessionDetailController, aiCodeController, \
-    testController, commonController, userProfileController
-from .controller.erp import erpController
-from .controller.dify import difyController
 from .db.db import create_tables
 from fastapi.openapi.docs import get_swagger_ui_html
 from starlette.staticfiles import StaticFiles
@@ -32,16 +29,12 @@ create_tables()
 
 app = FastAPI(docs_url=None, redoc_url=None)  # 禁用默认的 docs 和 redoc
 
-# todo 搞成自动注册路由
-app.include_router(apiInfoController.router)
-app.include_router(userProfileController.router)
-app.include_router(erpController.router)
-app.include_router(difyController.router)
-app.include_router(sessionController.router)
-app.include_router(sessionDetailController.router)
-app.include_router(aiCodeController.router)
-app.include_router(testController.router)
-app.include_router(commonController.router)
+# 自动注册路由
+blacklist = []  # 可以在这里添加不需要注册的控制器文件名
+register_routers(app, controller_dir="controller", blacklist=blacklist)
+
+# 添加中间件
+app.add_middleware(RequestLoggingMiddleware)
 
 
 
@@ -59,6 +52,7 @@ async def custom_swagger_ui_html():
         swagger_favicon_url="/static/swagger-ui/favicon-32x32.png",  # 本地图标
     )
 
+# todo 把main文件搞得简洁一点
 @app.get("/")
 async def root():
     return {"message": "Hello World"}

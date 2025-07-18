@@ -79,7 +79,7 @@ async def erp_order_search_without_check(data: dict, session: Session):
 
 async def erp_user_sale_info(data: dict, session: Session):
     """
-    订单查询
+    销售情况查询
     :param data:
     :param session:
     :return:

@@ -1,4 +1,5 @@
 import json
+import logging
 
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
@@ -18,7 +19,7 @@ from src.utils.dataUtils import translate_dict_keys_4_list
 
 router = APIRouter(prefix="/erp", tags=["ERP 相关"])
 
-
+logger = logging.getLogger(__name__)
 
 @router.post("/execute-sql-query")
 async def execute_sql_query(sql: SQLQuery, db: Session = Depends(get_db)):
@@ -77,8 +78,11 @@ async def seller_sale_info(data: ERPSellerSaleInfo, db: Session = Depends(get_db
 
 @router.post("/dify/seller_sale_info")
 async def dify_seller_sale_info(data: ERPUserSaleInfo, db: Session = Depends(get_db)):
+    logger.info(f"临时debug 入参 {data}")
     param = GetJsonModel(query=data.query,model="deepseek-chat",api_code=CodeEnum.ERP_USER_SALE_INFO_API_CODE.value)
+    logger.info(f"临时debug param {param}")
     json_data = await easy_json_structure_extraction(param)
+    logger.info(f"临时debug json_data {json_data}")
     result = await erp_user_sale_info({**json.loads(json_data), "token": data.token}, db)
     return HttpResponse.success(result)
 

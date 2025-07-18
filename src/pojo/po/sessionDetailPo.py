@@ -150,7 +150,7 @@ class SessionDetail(SQLModel, table=True):
         self.final_response = dict_list_2_json([DifyResponse.not_found_data().model_dump()])
 
 
-    def when_success(self,output: dict, response: DifyResponse|list|str):
+    def when_success(self,output: dict|str, response: DifyResponse|list|str):
         """
         当成功时,修改自身部分属性
         :param output: api的返回结果 dict类型
@@ -158,7 +158,10 @@ class SessionDetail(SQLModel, table=True):
         :return: void
         """
         self.finish_time = datetime.now()
-        self.api_output = dict_2_json(output)
+        if isinstance(output,str):
+            self.api_output = output
+        else :
+            self.api_output = dict_2_json(output)
         self.status = "200"
         if isinstance(response, list):
             self.final_response = dict_list_2_json(response)

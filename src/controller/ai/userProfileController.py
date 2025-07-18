@@ -24,7 +24,7 @@ from src.dao.userProfileDao import (
 from src.myHttp.bo.httpResponse import HttpResponse, HttpResponseModel
 from pydantic import BaseModel, Field
 
-from src.service.userProfileService import analysis_language_style
+from src.service.userProfileService import analysis_language_style, analysis_preference_questions
 
 router = APIRouter(prefix="/user-profile", tags=["用户画像"])
 
@@ -128,11 +128,22 @@ async def get_user_profile(user_id: str, db: Session = Depends(get_db)):
 @router.post("/analysis/language-style")
 async def get_user_profile(param: dict, db: Session = Depends(get_db)):
     """
-
+        分析语言风格
     """
     user_id = param.get('user_id')
     profile = get_profile_by_user_id(db, user_id)
     await analysis_language_style(session=db, profile=profile)
+    return HttpResponse.success(profile)
+
+
+@router.post("/analysis/preference-questions")
+async def get_user_profile(param: dict, db: Session = Depends(get_db)):
+    """
+        分析偏好问题
+    """
+    user_id = param.get('user_id')
+    profile = get_profile_by_user_id(db, user_id)
+    await analysis_preference_questions(session=db, profile=profile)
     return HttpResponse.success(profile)
 
 @router.get("/", response_model=HttpResponseModel[List[UserProfile]])

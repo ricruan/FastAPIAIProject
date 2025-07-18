@@ -4,9 +4,12 @@ from sqlmodel import Session
 from typing import Optional, Dict, Any, List
 
 from src.dao.sessionDao import create_session, get_recent_sessions, get_session_by_id, update_session
-from src.dao.sessionDetailDao import get_session_details_by_session_id
+from src.dao.sessionDetailDao import get_session_details_by_session_id, create_session_detail
+from src.db.db import engine
 from src.exception.aiException import AIException
-from src.pojo.po.sessionPo import SessionPo as SessionModel, SessionInfo
+from src.pojo.po.sessionDetailPo import SessionDetail, DialogCarrierEnum
+from src.pojo.po.sessionPo import SessionPo as SessionModel, SessionInfo, SessionPo
+from src.pojo.vo.difyResponse import DifyResponse
 
 
 def create_session_default(session: Session,user_id: str = None , token: str = None):
@@ -56,5 +59,24 @@ def when_search_session(session: Session,session_id: str) -> Optional[SessionInf
     update_session(session,session_model.id,session_model.model_dump())
     return session_info
 
+
+
+def dify_stream_handle(conversation_id: str,
+                       result,
+                       ai_session: SessionPo = None,
+                       ai_session_detail: SessionDetail = None,
+                       ):
+    with Session(engine) as session:
+        if ai_session:
+            if not ai_session.dify_conversation_id:
+                update_session(session,session_id=ai_session.id,update_data={'conversation_id':conversation_id})
+        if ai_session_detail:
+            if isinstance(result, DifyResponse) and 'dify error' in str(result.data):
+                ai_session_detail.when_error(result)
+            else:
+                ai_session_detail.when_success(result, result)
+            # 对话载体类型为 DIFY_ERP
+            ai_session_detail.dialog_carrier = DialogCarrierEnum.DIFY_ERP.value
+            create_session_detail(session=session, session_detail=ai_session_detail)
 
 

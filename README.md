@@ -1,6 +1,7 @@
 # FastAPI 项目 Docker 配置
 
 本目录包含用于容器化 FastAPI 应用程序的 Docker 配置文件。
+不要看，这是AI生成的
 
 ## 文件说明
 
@@ -73,7 +74,6 @@ PostgreSQL 数据存储在名为 `postgres_data` 的 Docker 卷中，确保数�
 ## 笔记
 docker build -t stone-ai:0.1.4 .
 docker save -o stone-ai-0.1.4.tar stone-ai:0.1.4
-DATABASE_URL=root:a3f5c8e1d7b90246@172.17.0.2:3306/stone_ai_db?charset=utf8mb4
 docker run -p 8000:8000 --env-file .env -d --name stone-ai-014 stone-ai:0.1.4
 
 重载ng

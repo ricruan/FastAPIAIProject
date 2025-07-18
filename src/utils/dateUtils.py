@@ -42,7 +42,7 @@ def get_now_4_prompt() -> str:
      用于提示词的当前日期
     :return:
     """
-    return f"当前日期：{datetime.now()} \n"
+    return f"(当前日期：{datetime.now()}) "
 
 # 示例用法
 if __name__ == "__main__":

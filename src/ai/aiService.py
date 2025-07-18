@@ -1,3 +1,4 @@
+import json
 import logging
 from string import Template
 from fastapi import Depends
@@ -57,7 +58,7 @@ async def sse_event_generator(response):
         # 从传入的异步生成器中逐块读取数据
         async for chunk in response:
             content = chunk.choices[0].delta.content if chunk.choices[0].delta.content else ""
-            yield f"data: {content}\n\n"
+            yield f"data: {json.dumps(content)}\n\n"
 
         # 可选：发送结束事件
         yield "event: end\n"
