@@ -16,7 +16,7 @@ def get_log_level_from_env():
         int: 日志级别对应的数值
     """
     # 从环境变量获取日志级别，默认为INFO
-    log_level_str = os.getenv('MY_LOG_LEVEL', 'INFO').upper()
+    log_level_str = os.getenv('LOG_LEVEL', 'INFO').upper()
     
     # 日志级别映射
     log_levels = {

@@ -7,6 +7,7 @@ from src.common.enum.codeEnum import CodeEnum
 from src.dao.apiInfoDao import get_info_by_api_code
 from src.dao.sessionDao import update_session
 from src.dao.sessionDetailDao import create_session_detail
+from src.dao.userProfileDao import get_profile_by_user_id
 from src.db.db import get_db
 from src.exception.aiException import AIException
 from src.myHttp.bo.httpResponse import HttpResponse
@@ -44,8 +45,13 @@ async def chatflow_jxm(param: DifyJxm, db: Session = Depends(get_db)):
     ai_session_detail.session_id = ai_session.id
     # 默认给dify续上多轮对话
     jxm_param["conversation_id"] = ai_session.dify_conversation_id
+
+    user_info = ""
+    profile = get_profile_by_user_id(session=db, user_id=param.user_id)
+    if profile:
+        user_info = profile.user_info
     # 给一下当前日期
-    jxm_param['query'] = get_now_4_prompt() + jxm_param['query']
+    jxm_param['query'] = f"{jxm_param['query']} (额外可参考信息:{get_now_4_prompt()},我的个人信息:{user_info})"
     # 内部临时先用阻塞
     # jxm_param["response_mode"] = "blocking"
     ai_session_detail.api_input = jxm_param
