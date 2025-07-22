@@ -146,6 +146,13 @@ class UserProfile(SQLModel, table=True):
         sa_column_kwargs={"comment": "上一次分析截止的会话详情id"}
     )
 
+    status: str = Field(
+        default=1,
+        max_length=16,
+        description="状态 0 停用分析 1 允许分析",
+        sa_column_kwargs={"comment": "状态 0 停用分析 1 允许分析"}
+    )
+
     @classmethod
     def get_profile(cls,user_id: str,source: str):
         return cls(user_id = user_id,

@@ -14,7 +14,7 @@ from src.pojo.bo.aiBo import GetJsonModel
 from src.service.aiCodeService import get_code_value_by_code
 from src.service.erpService import erp_execute_sql, erp_generate_popi, erp_order_search, \
     erp_inventory_detail_search_by_cn, erp_user_sale_info, inventory_analysis, erp_seller_sale_info_analysis, \
-    erp_generate_pi, erp_order_search_without_check
+    erp_generate_pi, erp_order_search_without_check, erp_inventory_detail_search
 from src.utils.dataUtils import translate_dict_keys_4_list
 
 router = APIRouter(prefix="/erp", tags=["ERP 相关"])
@@ -55,12 +55,12 @@ async def login_check(data: dict, db: Session = Depends(get_db)):
 
 @router.post("/inventory_detail")
 async def inventory_detail(data: ERPInventoryDetailSearch, db: Session = Depends(get_db)):
-    response = await erp_inventory_detail_search_by_cn(data.model_dump(), db)
+    response = await erp_inventory_detail_search(data.model_dump(), db)
     return HttpResponse.success(response)
 
 @router.post("/inventory_detail_analysis")
 async def inventory_detail_analysis(data: ERPInventoryDetailAnalysis, db: Session = Depends(get_db)):
-    response = await erp_inventory_detail_search_by_cn(data.to_parent().model_dump(), db)
+    response = await erp_inventory_detail_search(data.to_parent().model_dump(), db)
     prompt_text = get_code_value_by_code(session=db ,code_value = CodeEnum.ERP_INVENTORY_ANALYSIS_PROMPT_CODE.value)
     result = await inventory_analysis(data=response,prompt_text=prompt_text,model=data.model,stream=data.stream)
     if data.stream:
@@ -78,11 +78,8 @@ async def seller_sale_info(data: ERPSellerSaleInfo, db: Session = Depends(get_db
 
 @router.post("/dify/seller_sale_info")
 async def dify_seller_sale_info(data: ERPUserSaleInfo, db: Session = Depends(get_db)):
-    logger.info(f"临时debug 入参 {data}")
     param = GetJsonModel(query=data.query,model="deepseek-chat",api_code=CodeEnum.ERP_USER_SALE_INFO_API_CODE.value)
-    logger.info(f"临时debug param {param}")
     json_data = await easy_json_structure_extraction(param)
-    logger.info(f"临时debug json_data {json_data}")
     result = await erp_user_sale_info({**json.loads(json_data), "token": data.token}, db)
     return HttpResponse.success(result)
 

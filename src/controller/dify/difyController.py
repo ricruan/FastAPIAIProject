@@ -3,8 +3,6 @@ import json
 import random
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
-
-from src.ai.aiService import sse_event_generator
 from src.common.enum.codeEnum import CodeEnum
 from src.dao.apiInfoDao import get_info_by_api_code
 from src.dao.sessionDao import update_session
@@ -12,11 +10,11 @@ from src.dao.sessionDetailDao import create_session_detail
 from src.db.db import get_db
 from src.exception.aiException import AIException
 from src.myHttp.bo.httpResponse import HttpResponse
-from src.myHttp.utils.myHttpUtils import normal_post, stream_post_and_enqueue, dify_stream_post
+from src.myHttp.utils.myHttpUtils import normal_post, dify_stream_post
 from src.pojo.po.sessionDetailPo import SessionDetail, DialogCarrierEnum
 from src.pojo.vo.difyResponse import DifyResponse
 from src.pojo.vo.jixiaomeiVo import DifyJxm
-from src.service.difyService import dify_result_handler, NO_DATA_RESPONSE, answer_handler
+from src.service.difyService import dify_result_handler, NO_DATA_RESPONSE
 from src.service.sessionService import get_user_last_session
 from fastapi.responses import StreamingResponse
 import asyncio
@@ -64,10 +62,6 @@ async def chatflow_jxm(param: DifyJxm, db: Session = Depends(get_db)):
         nonlocal dify_response
         nonlocal result
         nonlocal param
-        if param.response_mode == "streaming":
-            dify_response = await stream_post_task
-            result = dify_response.get("result")
-            result = answer_handler(result)
         if ai_session.dify_conversation_id is None:
             # 获取到Dify的会话ID并持久化到本系统的会话表中
             ai_session.dify_conversation_id = dify_response.get("conversation_id")

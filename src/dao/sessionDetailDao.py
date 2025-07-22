@@ -4,6 +4,7 @@ from sqlmodel import Session, select, delete, update
 
 from src.pojo.po.sessionDetailPo import SessionDetail
 from src.pojo.po.sessionPo import SessionPo
+from sqlalchemy import func
 
 
 def create_session_detail(session: Session, session_detail: SessionDetail) -> SessionDetail:
@@ -221,6 +222,6 @@ def count_session_details(session: Session, session_id: str) -> int:
     Returns:
         会话详情的数量
     """
-    statement = select(SessionDetail).where(SessionDetail.session_id == session_id)
-    results = session.exec(statement).all()
-    return len(results)
+    statement = select(func.count()).select_from(SessionDetail).where(SessionDetail.session_id == session_id)
+    result = session.exec(statement).one()
+    return result

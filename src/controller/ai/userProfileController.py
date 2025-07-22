@@ -24,7 +24,8 @@ from src.dao.userProfileDao import (
 from src.myHttp.bo.httpResponse import HttpResponse, HttpResponseModel
 from pydantic import BaseModel, Field
 
-from src.service.userProfileService import analysis_language_style, analysis_preference_questions
+from src.service.userProfileService import analysis_language_style, analysis_preference_questions, \
+    analysis_personality_traits
 
 router = APIRouter(prefix="/user-profile", tags=["用户画像"])
 
@@ -144,6 +145,16 @@ async def get_user_profile(param: dict, db: Session = Depends(get_db)):
     user_id = param.get('user_id')
     profile = get_profile_by_user_id(db, user_id)
     await analysis_preference_questions(session=db, profile=profile)
+    return HttpResponse.success(profile)
+
+@router.post("/analysis/personality-traits")
+async def get_user_profile(param: dict, db: Session = Depends(get_db)):
+    """
+        分析性格特征
+    """
+    user_id = param.get('user_id')
+    profile = get_profile_by_user_id(db, user_id)
+    await analysis_personality_traits(session=db, profile=profile)
     return HttpResponse.success(profile)
 
 @router.get("/", response_model=HttpResponseModel[List[UserProfile]])

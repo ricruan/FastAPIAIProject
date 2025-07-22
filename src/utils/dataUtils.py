@@ -152,5 +152,13 @@ def translate_dict_keys_4_dict(data_dict, key_mapping):
     except Exception as e:
         return data_dict
 
+def nvl(value, default):
+    """
+    类似于SQL中的NVL函数
+    :param value:
+    :param default:
+    :return:
+    """
+    return default if value is None else value
 
 

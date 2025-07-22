@@ -1,10 +1,11 @@
+import os
 from datetime import datetime
 
 from sqlmodel import Session
 from typing import Optional, Dict, Any, List
 
 from src.dao.sessionDao import create_session, get_recent_sessions, get_session_by_id, update_session
-from src.dao.sessionDetailDao import get_session_details_by_session_id, create_session_detail
+from src.dao.sessionDetailDao import get_session_details_by_session_id, create_session_detail, count_session_details
 from src.db.db import engine
 from src.exception.aiException import AIException
 from src.pojo.po.sessionDetailPo import SessionDetail, DialogCarrierEnum
@@ -29,7 +30,7 @@ def create_session_default(session: Session,user_id: str = None , token: str = N
 
 def get_user_last_session(session: Session,user_id: str = None , token: str = None):
     """
-    获取用户最近一次的会话，如果没有的话创建一个新会话
+    获取用户最近一次的会话，如果没有或者最近一次会话轮数大于50 创建一个新会话
     :param session: db
     :param user_id: 用户ID
     :param token: token
@@ -37,9 +38,12 @@ def get_user_last_session(session: Session,user_id: str = None , token: str = No
     """
     session_list = get_recent_sessions(session,user_id)
     if session_list:
-        return session_list[0]
-    else:
-        return create_session_default(session,user_id,token)
+        ai_session = session_list[0]
+        cnt = count_session_details(session=session, session_id=ai_session.id)
+        if cnt < int(os.getenv("SESSION_MAX_NUM",50)):
+            return ai_session
+
+    return create_session_default(session,user_id,token)
 
 
 
@@ -66,6 +70,14 @@ def dify_stream_handle(conversation_id: str,
                        ai_session: SessionPo = None,
                        ai_session_detail: SessionDetail = None,
                        ):
+    """
+    处理Dify的流式数据
+    :param conversation_id: 会话ID
+    :param result: 返回结果
+    :param ai_session:  会话记录
+    :param ai_session_detail: 会话详情记录
+    :return:
+    """
     with Session(engine) as session:
         if ai_session:
             if not ai_session.dify_conversation_id:

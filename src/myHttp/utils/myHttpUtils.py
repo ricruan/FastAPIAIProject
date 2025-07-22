@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import os
 from asyncio import Event
 from typing import AsyncGenerator, Dict, Any
 
@@ -24,7 +25,7 @@ STREAM_HEADERS = {
 }
 
 ## todo 放到环境变量里面去
-TIMEOUT = 360
+TIMEOUT = int(os.getenv("DIFY_TIMEOUT",360))
 
 logger = logging.getLogger(__name__)
 
@@ -92,7 +93,7 @@ async def dify_stream_post(
                 if response.status != 200:
                     error_msg = f"Dify 接口异常: 状态码 {response.status}"
                     logger.error(error_msg)
-                    yield {"event": "error", "message": error_msg}
+                    yield f"event: dify error {error_msg}"
                     return
 
                 # 流式返回数据

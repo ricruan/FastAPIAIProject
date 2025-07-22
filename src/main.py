@@ -11,6 +11,8 @@ from .exception.aiException import AIException
 from .myHttp.bo.httpResponse import HttpResponse
 from fastapi import FastAPI, Request, status, HTTPException, APIRouter
 
+from .mySchedules.userProfileSchedules import start_scheduler, stop_scheduler
+
 # 初始化日志配置
 setup_logging()
 
@@ -35,6 +37,10 @@ register_routers(app, controller_dir="controller", blacklist=blacklist)
 
 # 添加中间件
 app.add_middleware(RequestLoggingMiddleware)
+
+# 定时任务
+app.add_event_handler("startup", start_scheduler)
+app.add_event_handler("shutdown", stop_scheduler)
 
 
 

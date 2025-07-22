@@ -7,6 +7,7 @@ from enum import Enum
 from sqlalchemy import Text
 from sqlmodel import SQLModel, Field, Index
 
+from src.ai.pojo.promptBo import PromptContent
 from src.exception.aiException import AIException
 from src.utils.dataUtils import is_valid_json
 
@@ -21,8 +22,8 @@ class PromptCodeEnum(str, Enum):
     """
     
     # 示例枚举值
-    QUESTION_RECOMMEND_PLUS_PROMPT = "QUESTION_RECOMMEND_PLUS_PROMPT", "问题推荐提示词"
-    USER_GUIDE = "user_guide", "用户指南"
+    QUESTION_RECOMMEND_PLUS_PROMPT = "question_recommend_plus_prompt", "用户画像问题推荐提示词"
+    PERSONALITY_TRAITS_PROMPT = "personality_traits_prompt", "用户画像性格分析提示词"
     ERROR_HANDLING = "error_handling", "错误处理"
     
     # 可以根据需要添加更多枚举值
@@ -199,7 +200,7 @@ class Prompt(SQLModel, table=True):
             Index("idx_status", "status")
         ]
 
-    def render_prompt(self,variable :dict):
+    def render_prompt(self,variable :dict) -> str:
         """
         使用占位符模板和传入的字典渲染提示词中的变量
         :param variable: 传入的变量字典
@@ -209,4 +210,10 @@ class Prompt(SQLModel, table=True):
         if not is_valid_json(self.placeholder_template):
             raise AIException.quick_raise(f"提示词{self.name} {self.code} 的变量模板json转化失败,请维护对应数据")
         return template.substitute({**json.loads(self.placeholder_template),**variable})
+
+    def get_messages(self,variable :dict):
+        if not self.user_prompt:
+            raise AIException.quick_raise(f"{self.code} {self.name}提示词缺失默认用户类型的提示词")
+        prompt_str = self.render_prompt(variable)
+        return PromptContent.to_messages(prompt=prompt_str, query=self.user_prompt)
 
