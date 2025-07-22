@@ -1,80 +1,51 @@
-# FastAPI 项目 Docker 配置
+# FastAPI AI项目 简介
+一边承接实际业务的同时想把这个项目做成一个AI应用的脚手架,搭建这个项目之前
+想去网上找一些脚手架框架,看了一下都不太合适，干脆自己搭一个。
 
-本目录包含用于容器化 FastAPI 应用程序的 Docker 配置文件。
-不要看，这是AI生成的
+## 目前功能
+(2025.07.22)
+- API信息管理 存储API信息,提供了便捷的从AI提取API参数到调用的函数,但是结果的处理需要自己实现
+- Prompt提示词管理 持久化提示词,提供便捷动态提示词处理，处理完的提示词目前主要服务于openAI库的调用
+- openAI库对 千问 豆包 deepseek 进行了封装， 豆包的封装还包含联网搜索
+- dify对接 存在一个实际业务的dify对接实例,并且对dify对话内容进行了持久化 保留了用户的历史对话记录
+- 用户画像 基于用户的历史对话记录通过定时任务进行用户画像分析
 
-## 文件说明
+## 部署和启动
+(2025.07.22)
+目前只需要一个外部mysql服务即可成功启动项目，后期可能会添加redis服务、milvus服务.
+部分接口执行会依赖一些初始化数据,可自行去src/db/ddl/dml.sql 中查看 (早期的数据有维护，后面没有维护了)
 
-- `Dockerfile`: 用于构建应用程序 Docker 镜像的配置文件
-- `.dockerignore`: 指定构建 Docker 镜像时要忽略的文件和目录
-- `docker-compose.yml`: 定义和运行多容器 Docker 应用程序的配置文件
+## 文件架构
+- src/ai 通用的对Ai库的封装已经常用函数封装，目前只对openAI库进行了封装
+- src/common 通用文件夹，打算放一些枚举类或常量
+- src/controller 控制层,存放接口
+- src/dao 数据访问层,存放数据库操作
+- src/db 数据库文件夹,存放数据库的DDL和DML
+- src/env 空的，当时AI自动生成的 忘记删了
+- src/exception 自定义异常类存放处
+- src/myHttp Http相关处理，包括结果封装类，以及http请求封装
+- src/mySchedules 定时任务存放处
+- src/pojo 实体类、视图类、业务类 存放处
+- src/service 业务逻辑层，存放业务逻辑
+- src/test 测试类存放处
+- src/utils 工具类存放处
+- static/ 静态资源存放处,部署到服务器上有时候请求不到swagger的UI资源，干脆把它download到本地了
 
-## 使用说明
 
-### 构建和运行 Docker 镜像
-
-1. 确保已安装 Docker 和 Docker Compose
-
-2. 在项目根目录下构建 Docker 镜像:
-
-```bash
-docker build -t fastapi-app -f docker/Dockerfile .
-```
-
-3. 运行 Docker 容器:
-
-```bash
-docker run -p 8000:8000 fastapi-app
-```
-
-### 使用 Docker Compose
-
-1. 启动所有服务:
-
-```bash
-docker-compose -f docker/docker-compose.yml up
-```
-
-2. 在后台启动所有服务:
-
-```bash
-docker-compose -f docker/docker-compose.yml up -d
-```
-
-3. 停止所有服务:
-
-```bash
-docker-compose -f docker/docker-compose.yml down
-```
-
-## 数据库配置
-
-默认的 `docker-compose.yml` 包含 PostgreSQL 数据库配置。如果你使用不同的数据库，请相应地修改配置。
-
-### PostgreSQL 配置
-
-- **用户名**: postgres
-- **密码**: postgres
-- **数据库名**: fastapi_db
-- **端口**: 5432
-- **连接 URL**: postgresql://postgres:postgres@db:5432/fastapi_db
-
-## 环境变量
-
-你可以在 `docker-compose.yml` 文件中的 `environment` 部分添加或修改环境变量。
-
-## 卷和持久化
-
-PostgreSQL 数据存储在名为 `postgres_data` 的 Docker 卷中，确保数据在容器重启后仍然存在。
-
-## 网络
-
-所有服务都连接到名为 `fastapi_network` 的 Docker 网络，允许它们相互通信。
 
 ## 笔记
+这是实际开发中打包镜像 部署docker容器时会用的命令  [stone-ai:0.1.5] 镜像名和版本可自行修改 
+
+
 docker build -t stone-ai:0.1.5 .
+
+
 docker save -o stone-ai-0.1.5.tar stone-ai:0.1.5
+
+
 docker load -i stone-ai-0.1.5.tar
+
+
 docker run -p 8000:8000 --env-file .env -d --name stone-ai-015 stone-ai:0.1.5
 
 重载ng
