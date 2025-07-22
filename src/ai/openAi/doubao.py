@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 doubao_openai_client = None
+doubao_online_openai_client = None
 
 async def get_doubao_completion(
     messages: List[Dict[str, str]],
@@ -84,19 +85,32 @@ async def online_search_doubao(messages: List[Dict[str, str]],
     :param kwargs: 照旧
     :return:
     """
-    return await get_doubao_completion(messages=messages,stream=stream, model=model, api_key=api_key, base_url=base_url, temperature=temperature)
+    global doubao_online_openai_client
+    if doubao_online_openai_client is None:
+        doubao_online_openai_client = AsyncOpenAI(api_key=api_key, base_url=base_url)
+    logger.info(f"豆包 API 提示词信息:\n {messages}")
+
+    # 调用 API 获取完成结果
+    response = await doubao_online_openai_client.chat.completions.create(
+        model=model,
+        messages=messages,
+        stream=stream,
+        temperature=temperature,
+    )
+
+    return response
 
 # 示例用法
 if __name__ == "__main__":
     example_messages = [
         {"role": "system", "content": "你是人工智能助手"},
-        {"role": "user", "content": "写一首苏轼的词"},
+        {"role": "user", "content": "中国准备新修的水电站在哪里"},
     ]
 
     async def main():
         # # 非流式示例
         print("非流式响应示例:")
-        response = await get_doubao_completion(example_messages, stream=False)
+        response = await online_search_doubao(example_messages, stream=False)
         print(handle_doubao_response_block(response))
 
         # 流式示例
