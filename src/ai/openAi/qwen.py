@@ -10,6 +10,7 @@ import os
 logger = logging.getLogger(__name__)
 load_dotenv()
 
+qwen_openai_client = None
 
 async def get_qwen_completion(
     messages: List[Dict[str, str]],
@@ -35,8 +36,10 @@ async def get_qwen_completion(
     Returns:
         OpenAI API的响应对象
     """
-    # 创建 OpenAI 客户端
-    client = AsyncOpenAI(api_key=api_key, base_url=base_url)
+    global qwen_openai_client
+    if qwen_openai_client is None:
+        qwen_openai_client = AsyncOpenAI(api_key=api_key, base_url=base_url)
+
 
     logger.info(f"通义千问 API 提示词信息:\n {messages}")
 
@@ -46,7 +49,7 @@ async def get_qwen_completion(
         extra_body["enable_search"] = True
 
     # 调用 API 获取完成结果
-    response = await client.chat.completions.create(
+    response = await qwen_openai_client.chat.completions.create(
         model=model,
         messages=messages,
         stream=stream,
@@ -80,16 +83,16 @@ if __name__ == "__main__":
 
     async def main():
         # 非流式示例
-        print("非流式响应示例:")
-        response = await get_qwen_completion(example_messages, stream=False, enable_search=True)
-        print(handle_qwen_response_block(response))
+        # print("非流式响应示例:")
+        # response = await get_qwen_completion(example_messages, stream=False, enable_search=True)
+        # print(handle_qwen_response_block(response))
 
         # 流式示例
-        # print("\n流式响应示例:")
-        # stream_response = await get_qwen_completion(example_messages, stream=True, enable_search=True)
-        # async for chunk in stream_response:
-        #     if chunk.choices[0].delta.content:
-        #         print(chunk.choices[0].delta.content, end="", flush=True)
+        print("\n流式响应示例:")
+        stream_response = await get_qwen_completion(example_messages, stream=True, enable_search=True)
+        async for chunk in stream_response:
+            if chunk.choices[0].delta.content:
+                print(chunk.choices[0].delta.content, end="", flush=True)
         print()  # 添加换行
 
     asyncio.run(main())

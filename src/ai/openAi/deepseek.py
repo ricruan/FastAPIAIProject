@@ -10,6 +10,7 @@ import os
 logger = logging.getLogger(__name__)
 load_dotenv()
 
+deepseek_openai_client = None
 
 async def get_deepseek_completion(
     messages: List[Dict[str, str]], 
@@ -33,12 +34,14 @@ async def get_deepseek_completion(
     Returns:
         OpenAI API 的响应对象
     """
-    # 创建 OpenAI 客户端
-    client = AsyncOpenAI(api_key=api_key, base_url=base_url)
+    global deepseek_openai_client
+    if deepseek_openai_client is None:
+        deepseek_openai_client = AsyncOpenAI(api_key=api_key, base_url=base_url)
+
 
     logger.info(f"Deepseek API 提示词信息:\n {messages}")
     # 调用 API 获取完成结果
-    response = await client.chat.completions.create(
+    response = await deepseek_openai_client.chat.completions.create(
         model=model,
         messages=messages,
         stream=stream,
@@ -66,10 +69,10 @@ if __name__ == "__main__":
 
 
     async def main():
-        response = await get_deepseek_completion(example_messages, stream=False)
-        print(handle_ds_response_block(response))
-        # async for chunk in response:
-        #     print(chunk.choices[0].delta.content, end="", flush=True)
+        response = await get_deepseek_completion(example_messages, stream=True)
+        # print(handle_ds_response_block(response))
+        async for chunk in response:
+            print(chunk.choices[0].delta.content, end="", flush=True)
 
 
     asyncio.run(main())
