@@ -1,8 +1,24 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 
 
+class DifyModel(BaseModel):
+    query: str = Field("", description="用户问题", example="你好")
+    conversation_id: Optional[str] = Field("", description="Dify会话ID 可不填", example="")
+    response_mode: str  = Field("streaming", description="响应模式", example="streaming")
+    user: str = Field(..., description="用户ID", example="dify_test")
+    inputs: dict = Field({}, description="额外入参", example="{}")
+
+class DifyYpjInputs(BaseModel):
+    houses_id: str = Field(..., description="房屋ID", example="11287")
+
+
+class DifyYpj(DifyModel):
+    inputs: DifyYpjInputs
+
+
+#  历史遗留产物 👇
 class DifyJxm(BaseModel):
     """Dify Jxm VO对象"""
     query: str  # 用户查询内容

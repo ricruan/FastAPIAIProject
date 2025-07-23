@@ -9,7 +9,7 @@ from sqlalchemy import Text
 from sqlmodel import SQLModel, Field, Index, text, ForeignKey
 
 from src.pojo.vo.difyResponse import DifyResponse
-from src.pojo.vo.jixiaomeiVo import DifyJxm
+from src.pojo.vo.difyParamVo import DifyJxm
 from src.utils.dataUtils import dict_list_2_json, dict_2_json, is_valid_json
 
 logger = logging.getLogger(__name__)
@@ -163,10 +163,16 @@ class SessionDetail(SQLModel, table=True):
         else :
             self.api_output = dict_2_json(output)
         self.status = "200"
+        if is_valid_json(response):
+            response = json.loads(response)
         if isinstance(response, list):
             self.final_response = dict_list_2_json(response)
         elif  isinstance(response, DifyResponse):
             self.final_response = dict_list_2_json([response.model_dump()])
+        elif isinstance(response,str):
+            self.final_response = str([DifyResponse.to_text(response).model_dump()])
+        elif isinstance(response,dict):
+            self.final_response = str([response])
         else :
             self.final_response = response
 

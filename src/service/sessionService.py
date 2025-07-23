@@ -87,8 +87,25 @@ def dify_stream_handle(conversation_id: str,
                 ai_session_detail.when_error(result)
             else:
                 ai_session_detail.when_success(result, result)
-            # 对话载体类型为 DIFY_ERP
-            ai_session_detail.dialog_carrier = DialogCarrierEnum.DIFY_ERP.value
             create_session_detail(session=session, session_detail=ai_session_detail)
+
+async def session_handle(ai_session,ai_session_detail,dify_response: dict,result):
+    """
+     session 的持久化处理 阻塞模式 4 dify
+    :return:
+    """
+    with Session(engine) as db:
+        if ai_session.dify_conversation_id is None:
+            # 获取到Dify的会话ID并持久化到本系统的会话表中
+            ai_session.dify_conversation_id = dify_response.get("conversation_id")
+            update_session(session=db, session_id=ai_session.id, update_data=ai_session.dict())
+        if isinstance(result,DifyResponse) and 'dify error' in str(result.data):
+            ai_session_detail.when_error(result)
+        else :
+            ai_session_detail.when_success(dify_response, result)
+        # 对话载体类型为 DIFY_ERP
+        ai_session_detail.dialog_carrier = DialogCarrierEnum.DIFY_ERP.value
+        create_session_detail(session=db, session_detail=ai_session_detail)
+        db.commit()
 
 

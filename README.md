@@ -15,8 +15,10 @@
 目前只需要一个外部mysql服务即可成功启动项目，后期可能会添加redis服务、milvus服务.
 部分接口执行会依赖一些初始化数据,可自行去src/db/ddl/dml.sql 中查看 (早期的数据有维护，后面没有维护了)
 
+**需要根据.env.template 创建一个.env文件**
+
 ## 文件架构
-- src/ai 通用的对Ai库的封装已经常用函数封装，目前只对openAI库进行了封装
+- src/ai 通用的对Ai库的封装以及常用函数封装，目前只对openAI库进行了封装
 - src/common 通用文件夹，打算放一些枚举类或常量
 - src/controller 控制层,存放接口
 - src/dao 数据访问层,存放数据库操作
@@ -37,16 +39,16 @@
 这是实际开发中打包镜像 部署docker容器时会用的命令  [stone-ai:0.1.5] 镜像名和版本可自行修改 
 
 
-docker build -t stone-ai:0.1.5 .
+docker build -t stone-ai:0.1.6 .
 
 
-docker save -o stone-ai-0.1.5.tar stone-ai:0.1.5
+docker save -o stone-ai-0.1.6.tar stone-ai:0.1.6
 
 
-docker load -i stone-ai-0.1.5.tar
+docker load -i stone-ai-0.1.6.tar
 
 
-docker run -p 8000:8000 --env-file .env -d --name stone-ai-015 stone-ai:0.1.5
+docker run -p 8000:8000 --env-file .env -d --name stone-ai-016 stone-ai:0.1.6
 
 重载ng
 nginx -t

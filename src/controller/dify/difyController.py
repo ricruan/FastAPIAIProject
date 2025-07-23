@@ -8,14 +8,14 @@ from src.dao.apiInfoDao import get_info_by_api_code
 from src.dao.sessionDao import update_session
 from src.dao.sessionDetailDao import create_session_detail
 from src.dao.userProfileDao import get_profile_by_user_id
-from src.db.db import get_db
+from src.db.db import get_db, engine
 from src.exception.aiException import AIException
 from src.myHttp.bo.httpResponse import HttpResponse
 from src.myHttp.utils.myHttpUtils import normal_post, dify_stream_post
 from src.pojo.po.sessionDetailPo import SessionDetail, DialogCarrierEnum
 from src.pojo.vo.difyResponse import DifyResponse
-from src.pojo.vo.jixiaomeiVo import DifyJxm
-from src.service.difyService import dify_result_handler, NO_DATA_RESPONSE
+from src.pojo.vo.difyParamVo import DifyJxm, DifyYpj
+from src.service.difyService import dify_result_handler, NO_DATA_RESPONSE, normal_dify_flow
 from src.service.sessionService import get_user_last_session
 from fastapi.responses import StreamingResponse
 import asyncio
@@ -33,79 +33,23 @@ logger = logging.getLogger(__name__)
 
 @router.post("/chatflow-jxm")
 async def chatflow_jxm(param: DifyJxm, db: Session = Depends(get_db)):
-    stream_post_task = None
     api_code = CodeEnum.JXM_API_CODE.value
-    api_info =get_info_by_api_code(session=db, api_code=api_code)
-    api_url = api_info.api_url
-    api_header = api_info.api_header
     jxm_param = param.to_jxm()
-    # 处理会话和对话信息
-    ai_session = get_user_last_session(session=db, user_id=param.user_id, token=param.token)
-    ai_session_detail = SessionDetail.from_dify_jxm(param)
-    ai_session_detail.session_id = ai_session.id
-    # 默认给dify续上多轮对话
-    jxm_param["conversation_id"] = ai_session.dify_conversation_id
+    return await normal_dify_flow(api_code=api_code,user_id=param.user_id,dify_param=jxm_param,db=db)
 
-    user_info = ""
-    profile = get_profile_by_user_id(session=db, user_id=param.user_id)
+@router.post("/chatflow-ypj")
+async def chatflow_ypj(param: DifyYpj,  db: Session = Depends(get_db)):
+    api_code = CodeEnum.YPJ_API_CODE.value
+    ypj_param = param.model_dump()
+    return await normal_dify_flow(api_code=api_code,user_id=param.user,dify_param=ypj_param,db=db)
+
+@router.get("/info/{user}")
+async def get_info(user: str, db: Session = Depends(get_db)):
+    user_info = "未查询到"
+    profile = get_profile_by_user_id(session=db, user_id=user)
     if profile:
         user_info = profile.user_info
-    # 给一下当前日期
-    jxm_param['query'] = f"{jxm_param['query']} (额外可参考信息:{get_now_4_prompt()},我的个人信息:{user_info})"
-    # 内部临时先用阻塞
-    # jxm_param["response_mode"] = "blocking"
-    ai_session_detail.api_input = jxm_param
-
-
-    dify_response = {}
-    result = ""
-
-    async def session_handle():
-        """
-         session 的持久化处理
-        :return:
-        """
-        nonlocal dify_response
-        nonlocal result
-        nonlocal param
-        if ai_session.dify_conversation_id is None:
-            # 获取到Dify的会话ID并持久化到本系统的会话表中
-            ai_session.dify_conversation_id = dify_response.get("conversation_id")
-            update_session(session=db, session_id=ai_session.id, update_data=ai_session.dict())
-
-        if isinstance(result,DifyResponse) and 'dify error' in str(result.data):
-            ai_session_detail.when_error(result)
-        else :
-            ai_session_detail.when_success(dify_response, result)
-        # 对话载体类型为 DIFY_ERP
-        ai_session_detail.dialog_carrier = DialogCarrierEnum.DIFY_ERP.value
-        create_session_detail(session=db, session_detail=ai_session_detail)
-
-    try:
-        if param.response_mode != "streaming":
-            dify_response = await normal_post(api_url, jxm_param, json.loads(api_header))
-            result = dify_result_handler(dify_response)
-            await session_handle()
-            return HttpResponse.success(result)
-
-        # todo: 之后可以把用户缓存到内存中 读取判断， 减少一次DB访问
-        check_new_user(user_id=param.user_id, session=db, user_source=DialogCarrierEnum.DIFY_ERP.value)
-        # 消息队列
-        # message_queue = asyncio.Queue()
-        # stream_post_task = asyncio.create_task(
-        #     stream_post_and_enqueue(message_queue, api_url, jxm_param, json.loads(api_header)))
-        # asyncio.create_task(session_handle())
-        return StreamingResponse(
-        dify_stream_post(url=api_url, data=jxm_param, headers=json.loads(api_header),ai_session=ai_session, ai_session_detail=ai_session_detail),
-        media_type="text/event-stream"
-    )
-    except  Exception as e:
-        ai_session_detail.when_error("问答流程异常或没有返回数据" + str(e))
-        create_session_detail(session=db, session_detail=ai_session_detail)
-        logger.error(e)
-        return HttpResponse.success([NO_DATA_RESPONSE])
-
-
+    return f"{get_now_4_prompt()} 用户的信息: {user_info}"
 
 async def event_stream_fake(text: str):
     """
