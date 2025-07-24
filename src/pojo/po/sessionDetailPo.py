@@ -148,6 +148,7 @@ class SessionDetail(SQLModel, table=True):
         self.api_output = reason
         self.status = "500"
         self.final_response = dict_list_2_json([DifyResponse.not_found_data().model_dump()])
+        self.self_check()
 
 
     def when_success(self,output: dict|str, response: DifyResponse|list|str):
@@ -175,6 +176,15 @@ class SessionDetail(SQLModel, table=True):
             self.final_response = str([response])
         else :
             self.final_response = response
+        self.self_check()
+
+    def self_check(self):
+        if not self.create_time:
+            self.create_time = datetime.now()
+        if not self.id:
+            self.id = uuid.uuid4().hex
+        if not self.finish_time:
+            self.finish_time = datetime.now()
 
     @classmethod
     def from_dify_jxm(cls, jxm: DifyJxm) -> "SessionDetail":

@@ -6,11 +6,15 @@ from sqlmodel import Session
 from starlette.responses import StreamingResponse
 from src.ai.aiService import sse_event_generator, easy_json_structure_extraction
 from src.common.enum.codeEnum import CodeEnum
+from src.dao.sessionDetailDao import create_session_detail
 from src.pojo.bo.erpBo import SQLQuery, ERPOrderSearch, ERPInventoryDetailSearch, ERPInventoryDetailAnalysis, \
     ERPSellerSaleInfo, ERPUserSaleInfo, ERPSellerSaleInfoAnalysis
 from src.db.db import get_db
 from src.myHttp.bo.httpResponse import HttpResponse
 from src.pojo.bo.aiBo import GetJsonModel
+from src.pojo.po.sessionDetailPo import SessionDetail
+from src.pojo.vo.difyResponse import DifyResponse
+from src.pojo.vo.erpVo import PipoFile
 from src.service.aiCodeService import get_code_value_by_code
 from src.service.erpService import erp_execute_sql, erp_generate_popi, erp_order_search, \
     erp_inventory_detail_search_by_cn, erp_user_sale_info, inventory_analysis, erp_seller_sale_info_analysis, \
@@ -32,6 +36,18 @@ async def execute_sql_query(sql: SQLQuery, db: Session = Depends(get_db)):
 async def generate_po_pi(data: dict, db: Session = Depends(get_db)):
     response = await erp_generate_popi(data, db)
     return HttpResponse.success(response)
+
+@router.post("/generate_popi/fake")
+async def generate_po_pi(data: PipoFile, db: Session = Depends(get_db)):
+    if data.type.upper() == "PO":
+        response = await erp_generate_popi({'ids' : data.ids,'token' : data.token}, db)
+    else :
+        response = await erp_generate_pi({'ids' : data.ids,'token' : data.token}, db)
+    dify_res = DifyResponse.to_url(response)
+    sd = SessionDetail(api_input=data.query,user_question=data.query,session_id=data.session_id)
+    sd.when_success(output=response,response=dify_res)
+    create_session_detail(session=db,session_detail=sd)
+    return HttpResponse.success([dify_res])
 
 @router.post("/generate_pi")
 async def generate_po_pi(data: dict, db: Session = Depends(get_db)):
