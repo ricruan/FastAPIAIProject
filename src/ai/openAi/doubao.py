@@ -1,5 +1,4 @@
 # FILEPATH: C:/Ric/RicProjects/FastAPIProject/src/ai/openAi/doubao.py
-
 import asyncio
 import logging
 from openai import AsyncOpenAI
@@ -7,6 +6,8 @@ from typing import List, Dict, Any
 from openai.types.chat import ChatCompletion
 from dotenv import load_dotenv
 import os
+from src.ai.pojo.openAiBo import OpenAiParam
+from src.utils.dataUtils import nvl
 
 logger = logging.getLogger(__name__)
 load_dotenv()
@@ -15,40 +16,34 @@ doubao_openai_client = None
 doubao_online_openai_client = None
 
 async def get_doubao_completion(
-    messages: List[Dict[str, str]],
-    stream: bool = False,
-    model: str = os.getenv("DOUBAO_MODEL", "doubao-1-5-thinking-pro-250415"),
-    api_key: str = os.getenv("DOUBAO_API_KEY", ""),
-    base_url: str = os.getenv("DOUBAO_BASE_URL", "https://ark.cn-beijing.volces.com/api/v3"),
-    temperature: float = float(os.getenv("DOUBAO_TEMPERATURE", 1.0)),
+    params: OpenAiParam,
     **kwargs
 ) -> Any:
     """
     调用豆包API获取聊天完成结果
 
     Args:
-        messages: 消息列表，每个消息是一个包含'role'和'content'的字典
-        stream: 是否使用流式响应，默认为False
-        model: 使用的模型名称，默认为"doubao-1-5-thinking-pro-250415"
-        api_key: 豆包API密钥
-        base_url: 豆包API基础URL
-        temperature: 温度参数，默认为1.0
+        :param params:
     Returns:
         OpenAI API的响应对象
     """
     global doubao_openai_client
     if doubao_openai_client is None:
-        doubao_openai_client = AsyncOpenAI(api_key=api_key, base_url=base_url)
+        doubao_openai_client = AsyncOpenAI(api_key=nvl(params.api_key,os.getenv("DOUBAO_API_KEY")),
+                                         base_url=nvl(params.base_url,os.getenv("DOUBAO_BASE_URL")))
 
-
-    logger.info(f"豆包 API 提示词信息:\n {messages}")
+    if not params.model:
+        params.model = os.getenv("DEFAULT_DOUBAO_MODEL")
+    if not params.temperature:
+        params.temperature = os.getenv("DOUBAO_TEMPERATURE",1.0)
+    logger.info(f"豆包 API 提示词信息:\n {params.messages}")
 
     # 调用 API 获取完成结果
     response = await doubao_openai_client.chat.completions.create(
-        model=model,
-        messages=messages,
-        stream=stream,
-        temperature=temperature,
+        model=params.model,
+        messages=params.messages,
+        stream=params.stream,
+        temperature=float(params.temperature),
     )
 
     return response
@@ -67,35 +62,32 @@ def handle_doubao_response_block(response: ChatCompletion) -> str:
     return result
 
 
-async def online_search_doubao(messages: List[Dict[str, str]],
-    stream: bool = False,
-    model: str = os.getenv("ONLINE_MODEL"),
-    api_key: str = os.getenv("DOUBAO_API_KEY", ""),
-    base_url: str = os.getenv("ONLINE_DOUBAO_BASE_URL", "https://ark.cn-beijing.volces.com/api/v3/bots"),
-    temperature: float = float(os.getenv("DOUBAO_TEMPERATURE", 1.0)),
+async def online_search_doubao(
+    params: OpenAiParam,
     **kwargs):
     """
     联网搜索版本
-    :param messages: 照旧
-    :param stream: 照旧
-    :param model: 需要修改
-    :param api_key: 照旧
-    :param base_url: 需要修改
-    :param temperature: 照旧
+    :param params:
     :param kwargs: 照旧
     :return:
     """
     global doubao_online_openai_client
     if doubao_online_openai_client is None:
-        doubao_online_openai_client = AsyncOpenAI(api_key=api_key, base_url=base_url)
-    logger.info(f"豆包 API 提示词信息:\n {messages}")
+        doubao_online_openai_client = AsyncOpenAI(api_key=nvl(params.api_key, os.getenv("DOUBAO_API_KEY")),
+                                           base_url=nvl(params.base_url, os.getenv("ONLINE_DOUBAO_BASE_URL", "https://ark.cn-beijing.volces.com/api/v3/bots")))
+    logger.info(f"豆包 API 提示词信息:\n {params.messages}")
+
+    if not params.model:
+        params.model = os.getenv("ONLINE_MODEL")
+    if not params.temperature:
+        params.temperature = os.getenv("DOUBAO_TEMPERATURE",1.0)
 
     # 调用 API 获取完成结果
     response = await doubao_online_openai_client.chat.completions.create(
-        model=model,
-        messages=messages,
-        stream=stream,
-        temperature=temperature,
+        model=params.model,
+        messages=params.messages,
+        stream=params.stream,
+        temperature=float(params.temperature),
     )
 
     return response
@@ -107,18 +99,25 @@ if __name__ == "__main__":
         {"role": "user", "content": "中国准备新修的水电站在哪里"},
     ]
 
+    example_messages2 = [
+        {"role": "system", "content": "你是人工智能助手"},
+        {"role": "user", "content": "三国演义的作者是谁"},
+    ]
+
     async def main():
         # # 非流式示例
         print("非流式响应示例:")
-        response = await online_search_doubao(example_messages, stream=False)
-        print(handle_doubao_response_block(response))
+        # params = OpenAiParam(messages=example_messages, stream=False)
+        # response = await online_search_doubao(params=params)
+        # print(handle_doubao_response_block(response))
 
         # 流式示例
         # print("\n流式响应示例:")
-        # stream_response = await get_doubao_completion(example_messages, stream=True)
-        # async for chunk in stream_response:
-        #     if chunk.choices[0].delta.content:
-        #         print(chunk.choices[0].delta.content, end="", flush=True)
+        params = OpenAiParam(messages=example_messages2, stream=True)
+        stream_response = await get_doubao_completion(params)
+        async for chunk in stream_response:
+            if chunk.choices[0].delta.content:
+                print(chunk.choices[0].delta.content, end="", flush=True)
         print()  # 添加换行
 
     asyncio.run(main())

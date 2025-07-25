@@ -56,8 +56,10 @@ async def analysis_by_user(profile: UserProfile):
     """
     logger.info(f"【用户画像分析】:对用户{profile.user_id}的分析开始")
     with Session(engine) as session:
+        histories = get_history_qa_by_user_id(session=session, user_id=profile.user_id,
+                                              last_handle_session_id=profile.last_handle_session_id)
         try:
-            await analysis_language_style(session=session,profile=profile)
+            await analysis_language_style(session=session,profile=profile,histories=histories)
         except Exception as e:
             logger.error(f"【用户画像分析】【语言风格】:用户({profile.user_id})分析发生异常\n{e}")
         try:
@@ -65,20 +67,32 @@ async def analysis_by_user(profile: UserProfile):
         except Exception as e:
             logger.error(f"【用户画像分析】【偏好问题】:用户({profile.user_id})分析发生异常\n{e}")
         try:
-            await analysis_personality_traits(session=session,profile=profile)
+            await analysis_personality_traits(session=session,profile=profile,histories=histories)
         except Exception as e:
             logger.error(f"【用户画像分析】【性格特征】:用户({profile.user_id})分析发生异常\n{e}")
 
-async def analysis_language_style(session: Session,profile: UserProfile):
+        if histories:
+            update_user_profile(session=session, profile_id=profile.id, update_data={
+                                                                                     'last_handle_session_id':histories[0]['id'],
+                                                                                     'update_time': datetime.now()})
+        else:
+            print()
+
+
+
+async def analysis_language_style(session: Session,profile: UserProfile,histories: list = None):
     """
     分析用户画像中的 语言风格, 并更新字段
+    :param histories:历史对话记录
     :param session:
     :param profile:
     :return:
     """
+    if histories is None:
+        histories = get_history_qa_by_user_id(session=session, user_id=profile.user_id,
+                                              last_handle_session_id=profile.last_handle_session_id)
     # todo 后期加循环，一次处理完所有未处理的对话。目前prompt限制  limit 50 once
     user_prompt = "结合AI之前对我总结的语言风格,以及我与AI新的历史问答记录,再次生成一份新的语言风格总结。以下是旧的语言风格总结内容:"
-    histories = get_history_qa_by_user_id(session=session, user_id=profile.user_id, last_handle_session_id=profile.last_handle_session_id)
     if not histories :
         logger.info(f"【用户画像分析】【语言风格】:该用户({profile.user_id})暂无新的未分析对话,本次分析过程跳过.")
         return
@@ -103,9 +117,11 @@ async def analysis_preference_questions(session: Session,profile: UserProfile):
     logger.info(f"【用户画像分析】【偏好问题】:用户({profile.user_id})分析完成")
 
 
-async def analysis_personality_traits(session: Session,profile: UserProfile):
+async def analysis_personality_traits(session: Session,profile: UserProfile,histories: list = None):
+    if histories is None:
+        histories = get_history_qa_by_user_id(session=session, user_id=profile.user_id,
+                                              last_handle_session_id=profile.last_handle_session_id)
     prompt = get_prompt_by_code_service(session=session, code=PromptCodeEnum.PERSONALITY_TRAITS_PROMPT.value)
-    histories = get_history_normal(session=session, user_id=profile.user_id, last_handle_session_id=profile.last_handle_session_id)
     messages = prompt.get_messages(variable={**profile.model_dump(),'histories':histories})
     result = await do_api_2_llm(ModelConfig(model='deepseek-reasoner', messages=messages, stream=False))
     update_user_profile(session=session, profile_id=profile.id,update_data={'personality_traits':result})

@@ -5,6 +5,7 @@ from fastapi import Depends
 from sqlmodel import Session
 from src.ai.openAi.deepseek import get_deepseek_completion, handle_ds_response_block
 from src.ai.openAi.qwen import get_qwen_completion
+from src.ai.pojo.openAiBo import OpenAiParam
 from src.ai.pojo.promptBo import PromptContent
 from src.common.enum.codeEnum import CodeEnum
 from src.db.db import get_db, engine
@@ -21,22 +22,22 @@ logger = logging.getLogger(__name__)
 
 async def do_api_2_llm(llm_prams: ModelConfig) -> str:
     """
-    根据model入参自动选择调用模型类型
+    根据model入参自动选择调用模型类型 (依赖openai库的实现)
     :param llm_prams: 模型配置参数及messages,messages必传
     :return:
     """
     if llm_prams.messages is None:
         raise AIException.quick_raise("messages is required")
 
-
+    params = OpenAiParam(**llm_prams.model_dump())
     if "deepseek" in llm_prams.model:
-        response = await get_deepseek_completion(**llm_prams.model_dump())
+        response = await get_deepseek_completion(params)
 
     elif "qwen" in llm_prams.model:
-        response = await get_qwen_completion(**llm_prams.model_dump())
+        response = await get_qwen_completion(params)
 
     else:
-        response = await get_deepseek_completion(**llm_prams.model_dump())
+        response = await get_deepseek_completion(params)
 
     if llm_prams.stream:
         result = response

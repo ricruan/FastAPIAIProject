@@ -17,6 +17,7 @@ RUN apt-get update \
         pkg-config \
         libmariadb-dev \
         tzdata \
+        wkhtmltopdf \
     && ln -fs /usr/share/zoneinfo/$TZ /etc/localtime \
     && dpkg-reconfigure -f noninteractive tzdata \
     && apt-get clean \

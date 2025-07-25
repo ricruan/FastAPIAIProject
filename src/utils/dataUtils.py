@@ -159,6 +159,6 @@ def nvl(value, default):
     :param default:
     :return:
     """
-    return default if value is None else value
+    return default if not value else value
 
 
