@@ -7,19 +7,19 @@ INSERT INTO stone_ai_db.api_info
 VALUES('3fdify21535c-1d9e-4b6f-a8c3-7b5d2e6f4a1c', 'dify', 'erp_exec_sql', 'ERP执行SQL接口', 'https://pmserp.toasin.cn/api/demo/executeSqlQuery', '', 'ERP系统执行SQL的接口', NULL, NULL, NULL, '2025-06-23 03:21:57', '2025-06-23 03:27:30');
 INSERT INTO stone_ai_db.api_info
 (id, type_code, api_code, api_name, api_url, api_header, api_desc, api_param_struct, api_param_desc, api_param_template, create_time, update_time)
-VALUES('3fdify2e9s6c-1d9e-4b6f-a8c3-7b5d2e6f4a1c', 'erp', 'erp_generate_popi', 'PO/PI生成接口', 'https://pmserp.toasin.cn/api/sales/downloadcontract', '', 'ERP系统生成PO/PI的接口', NULL, NULL, NULL, '2025-06-23 03:21:57', '2025-06-23 03:27:30');
+VALUES('3fdify2e9s6c-1d9e-4b6f-a8c3-7b5d2e6f4a1c', 'business', 'erp_generate_popi', 'PO/PI生成接口', 'https://pmserp.toasin.cn/api/sales/downloadcontract', '', 'ERP系统生成PO/PI的接口', NULL, NULL, NULL, '2025-06-23 03:21:57', '2025-06-23 03:27:30');
 INSERT INTO stone_ai_db.api_info
 (id, type_code, api_code, api_name, api_url, api_header, api_desc, api_param_struct, api_param_desc, api_param_template, create_time, update_time)
-VALUES('d1d2c3y6s6c-1d9e-4b6f-a8c3-7b5d2e6f4a1c', 'erp', 'erp_order_search', '订单查询接口', 'https://pmserp.toasin.cn/api/sales/querySalesOrders', '', 'ERP系统生成订单查询的接口', NULL, NULL, NULL, '2025-06-23 03:21:57', '2025-06-23 03:27:30');
+VALUES('d1d2c3y6s6c-1d9e-4b6f-a8c3-7b5d2e6f4a1c', 'business', 'erp_order_search', '订单查询接口', 'https://pmserp.toasin.cn/api/sales/querySalesOrders', '', 'ERP系统生成订单查询的接口', NULL, NULL, NULL, '2025-06-23 03:21:57', '2025-06-23 03:27:30');
 INSERT INTO stone_ai_db.api_info
 (id, type_code, api_code, api_name, api_url, api_header, api_desc, api_param_struct, api_param_desc, api_param_template, create_time, update_time)
-VALUES('k1c2x3q36sc-1d9e-4b6f-a8c3-7b5d2e6f4a1c', 'erp', 'erp_inventory_detail_search', '库存详情查询接口', 'https://pmserp.toasin.cn/api/inventory/get_stock_details', '', 'ERP系统生成库存详情查询的接口', NULL, NULL, NULL, '2025-06-23 03:21:57', '2025-06-23 03:27:30');
+VALUES('k1c2x3q36sc-1d9e-4b6f-a8c3-7b5d2e6f4a1c', 'business', 'erp_inventory_detail_search', '库存详情查询接口', 'https://pmserp.toasin.cn/api/inventory/get_stock_details', '', 'ERP系统生成库存详情查询的接口', NULL, NULL, NULL, '2025-06-23 03:21:57', '2025-06-23 03:27:30');
 INSERT INTO stone_ai_db.api_info
 (id, type_code, api_code, api_name, api_url, api_header, api_desc, api_param_struct, api_param_desc, api_param_template, create_time, update_time)
 VALUES('cd386762-a3d8-4390-a430-13e54b88d0a1', 'func', 'datetime_to_timestamp', '时间转Unix时间戳函数', '', NULL, '将给定的日期时间和时区偏移转换为Unix时间戳（秒级）', '[{"year": "2024", "month": "1","day": "1"},{"year": "2024", "month": "2","day": "1"}]', 'year (int): 年份，如2025', '输入：2025年6月13日张三的销售额是多少', '2025-07-09 10:22:47', '2025-07-09 10:22:47');
 INSERT INTO stone_ai_db.api_info
 (id, type_code, api_code, api_name, api_url, api_header, api_desc, api_param_struct, api_param_desc, api_param_template, create_time, update_time)
-VALUES('9c604732-eca7-484d-bf28-8e0b446dcfdb', 'erp', 'erp_user_sale_info', 'ERP获取用户销售情况', 'https://pmserp.toasin.cn/api/sales/getSalesStatistics', NULL, 'ERP系统获取用户在指定时间范围内的销售情况', '{"seller_name":"Tony","startDate":"2021-05-12","endDate":"2025-09-13"}', ' seller_name 字符类型 销售员，人名或英文名
+VALUES('9c604732-eca7-484d-bf28-8e0b446dcfdb', 'business', 'erp_user_sale_info', 'ERP获取用户销售情况', 'https://pmserp.toasin.cn/api/sales/getSalesStatistics', NULL, 'ERP系统获取用户在指定时间范围内的销售情况', '{"seller_name":"Tony","startDate":"2021-05-12","endDate":"2025-09-13"}', ' seller_name 字符类型 销售员，人名或英文名
  startDate 字符类型 开始时间，未识别到可提取为空字符串
  endDate 字符类型 结束时间，未识别到可提取为空字符串', ' 输入： 2025年6月13日张三的销售额是多少
  输出： {"seller_name":"张三","startDate":"2025-06-13","endDate":"2025-06-13"}

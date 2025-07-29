@@ -58,6 +58,8 @@ coverage.xml
 .hypothesis/
 
 
+uploads/*
+
 
 # Jupyter Notebook
 .ipynb_checkpoints

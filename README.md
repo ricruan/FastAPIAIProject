@@ -39,16 +39,16 @@
 这是实际开发中打包镜像 部署docker容器时会用的命令  [stone-ai:0.1.5] 镜像名和版本可自行修改 
 
 
-docker build -t stone-ai:0.1.7 .
+docker build -t stone-ai:0.1.8 .
 
 
-docker save -o stone-ai-0.1.7.tar stone-ai:0.1.7
+docker save -o stone-ai-0.1.8.tar stone-ai:0.1.8
 
 
-docker load -i stone-ai-0.1.7.tar
+docker load -i stone-ai-0.1.8.tar
 
 
-docker run -p 8000:8000 --env-file .env -d --name stone-ai-017 stone-ai:0.1.7
+docker run -p 8000:8000 --env-file .env -d --name stone-ai-018 stone-ai:0.1.8
 
 重载ng
 nginx -t

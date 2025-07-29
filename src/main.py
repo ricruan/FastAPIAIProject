@@ -1,4 +1,5 @@
 import logging
+import os
 import uuid
 
 from fastapi.exceptions import RequestValidationError
@@ -42,10 +43,13 @@ app.add_middleware(RequestLoggingMiddleware)
 app.add_event_handler("startup", start_scheduler)
 app.add_event_handler("shutdown", stop_scheduler)
 
-
+# 确保上传目录存在
+UPLOAD_DIR = "uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # 挂载本地静态文件
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/files", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 # 自定义 Swagger UI 路由, FastAPI swagger 默认从CDN读下面那两个资源,但是有的网络环境下读不到
 @app.get("/docs", include_in_schema=False)

@@ -1,7 +1,6 @@
 import json
 import logging
 from string import Template
-from fastapi import Depends
 from sqlmodel import Session
 from src.ai.openAi.deepseek import get_deepseek_completion, handle_ds_response_block
 from src.ai.openAi.qwen import get_qwen_completion
@@ -10,7 +9,7 @@ from src.ai.pojo.promptBo import PromptContent
 from src.common.enum.codeEnum import CodeEnum
 from src.db.db import get_db, engine
 from src.exception.aiException import AIException
-from src.pojo.bo.aiBo import GetJsonModel, NormalLLMRequestModel, ModelConfig
+from src.pojo.bo.aiBo import GetJsonModel, ModelConfig
 from src.service.aiCodeService import get_code_value_by_code
 from src.service.apiInfoService import api_info_2_struct_str
 from src.utils.dateUtils import get_now_4_prompt

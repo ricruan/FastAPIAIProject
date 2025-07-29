@@ -17,7 +17,7 @@ from src.pojo.vo.difyResponse import DifyResponse
 from src.pojo.vo.erpVo import PipoFile
 from src.service.aiCodeService import get_code_value_by_code
 from src.service.erpService import erp_execute_sql, erp_generate_popi, erp_order_search, \
-    erp_inventory_detail_search_by_cn, erp_user_sale_info, inventory_analysis, erp_seller_sale_info_analysis, \
+     erp_user_sale_info, inventory_analysis, erp_seller_sale_info_analysis, \
     erp_generate_pi, erp_order_search_without_check, erp_inventory_detail_search
 from src.utils.dataUtils import translate_dict_keys_4_list
 

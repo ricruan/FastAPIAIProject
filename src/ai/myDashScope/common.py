@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 API_KEY = os.getenv("DASHSCOPE_API_KEY")
 
 class DashScopeAPIParam(BaseModel):
-    app_id: str = Field(..., description="APP ID")
+    app_id: str = Field(None, description="APP ID")
     stream: bool = Field(None, description="流式响应")
     messages: list = Field(None, description="消息")
     prompt: str = Field(None, description="用户提示词,同时使用时追加一条到消息后面", example="你好")
@@ -76,10 +76,10 @@ if __name__ == '__main__':
         {"role": "user", "content": "讲一个短故事"},
     ]
 
-    response1 = get_dashscope_completion(DashScopeAPIParam(api_key=os.getenv("DASHSCOPE_API_KEY"),
+    response1 = get_dashscope_completion(DashScopeAPIParam(
                                                            app_id=os.getenv("ADDRESS_APP_ID"),
                                                            # messages=example_messages,
-                                                           prompt = "2+3=几")
+                                                           prompt = "深圳市南山区南山区粤海街道滨海社区海天二路19号盈峰中心")
                                          )
     s = result_handle(response1,stream=False)
     print("\n")
