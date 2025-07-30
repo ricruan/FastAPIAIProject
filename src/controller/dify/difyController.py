@@ -4,23 +4,13 @@ import random
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
 from src.common.enum.codeEnum import CodeEnum
-from src.dao.apiInfoDao import get_info_by_api_code
-from src.dao.sessionDao import update_session
-from src.dao.sessionDetailDao import create_session_detail
 from src.dao.userProfileDao import get_profile_by_user_id
 from src.db.db import get_db, engine
 from src.exception.aiException import AIException
-from src.myHttp.bo.httpResponse import HttpResponse
-from src.myHttp.utils.myHttpUtils import normal_post, dify_stream_post
-from src.pojo.po.sessionDetailPo import SessionDetail, DialogCarrierEnum
-from src.pojo.vo.difyResponse import DifyResponse
 from src.pojo.vo.difyParamVo import DifyJxm, DifyYpj
-from src.service.difyService import dify_result_handler, NO_DATA_RESPONSE, normal_dify_flow
-from src.service.sessionService import get_user_last_session
+from src.service.difyService import normal_dify_flow
 from fastapi.responses import StreamingResponse
 import asyncio
-
-from src.service.userProfileService import check_new_user
 from src.utils.dataUtils import is_valid_json
 from src.utils.dateUtils import get_now_4_prompt
 

@@ -1,14 +1,15 @@
 import json
 import logging
-
+from builtins import filter
 from fastapi import APIRouter, Depends
+from sqlalchemy.dialects.mssql.information_schema import sequences
 from sqlmodel import Session
 from starlette.responses import StreamingResponse
 from src.ai.aiService import sse_event_generator, easy_json_structure_extraction
 from src.common.enum.codeEnum import CodeEnum
-from src.dao.sessionDetailDao import create_session_detail
+from src.dao.sessionDetailDao import create_session_detail, search_session_details_by_user_id, update_session_detail
 from src.pojo.bo.erpBo import SQLQuery, ERPOrderSearch, ERPInventoryDetailSearch, ERPInventoryDetailAnalysis, \
-    ERPSellerSaleInfo, ERPUserSaleInfo, ERPSellerSaleInfoAnalysis
+    ERPSellerSaleInfo, ERPUserSaleInfo, ERPSellerSaleInfoAnalysis, ERPSaveOrder
 from src.db.db import get_db
 from src.myHttp.bo.httpResponse import HttpResponse
 from src.pojo.bo.aiBo import GetJsonModel
@@ -19,7 +20,7 @@ from src.service.aiCodeService import get_code_value_by_code
 from src.service.erpService import erp_execute_sql, erp_generate_popi, erp_order_search, \
      erp_user_sale_info, inventory_analysis, erp_seller_sale_info_analysis, \
     erp_generate_pi, erp_order_search_without_check, erp_inventory_detail_search
-from src.utils.dataUtils import translate_dict_keys_4_list
+from src.utils.dataUtils import translate_dict_keys_4_list, is_valid_json
 
 router = APIRouter(prefix="/erp", tags=["ERP 相关"])
 
@@ -108,3 +109,17 @@ async def seller_sale_info_analysis(params: ERPSellerSaleInfoAnalysis, db: Sessi
             media_type="text/event-stream"
         )
     return HttpResponse.success(result)
+
+@router.post("/save_order_history")
+async def save_order_info(params: ERPSaveOrder, db: Session = Depends(get_db)):
+    session_details = search_session_details_by_user_id(session=db,user_id=params.user_id,limit=10)
+    result =  next((
+    x for x in session_details
+    if is_valid_json(x.final_response)
+    and isinstance(json.loads(x.final_response), list)
+    and 'order-form' in json.loads(x.final_response)[0]['type']
+    ),None)
+    if not result:
+        return HttpResponse.error("未查询到对应的创建订单对话")
+    update_session_detail(session=db,detail_id=result.id,update_data={'final_response': params.result})
+    return HttpResponse.success(result.id)

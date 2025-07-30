@@ -58,7 +58,7 @@ async def normal_dify_flow(api_code: str,user_id: str,dify_param: dict,db: Sessi
     try:
         if dify_param['response_mode'] != "streaming":
             dify_response = await normal_post(api_url, dify_param, json.loads(api_header))
-            result = dify_result_handler(dify_response)
+            result = dify_result_handler(dify_response).model_dump()
             asyncio.create_task(session_handle(ai_session,ai_session_detail,dify_response,result))
             if not isinstance(result,list):
                 result = [result]
@@ -110,6 +110,7 @@ def answer_handler(answer) -> DifyResponse|list:
     elif isinstance(answer, list):
         return answer
     elif isinstance(answer, str):
-        return DifyResponse.to_text(answer)
+        result = answer.replace('"',"“").replace("'","“")
+        return DifyResponse.to_text(result)
     return NO_DATA_RESPONSE
 

@@ -33,5 +33,10 @@ class ERPSellerSaleInfo(TokenModel):
     startDate: str = Field(..., description="开始时间", example="2025-05-12")
     endDate: str = Field(..., description="结束时间", example="2025-05-13")
 
+
+class ERPSaveOrder(BaseModel):
+    user_id: str = Field(..., description="用户ID", example="123")
+    result: str = Field(..., description="最终保存返回结果", example="{}")
+
 class ERPSellerSaleInfoAnalysis(NormalLLMRequestModel):
     sale_data: str = Field(..., description="销售情况数据", example='''[{"category_id":96120,"category_name":"集成电路","total_amount":210000,"order_count":3},{"category_id":95967,"category_name":"中央处理器","total_amount":1600,"order_count":10}]''')

@@ -102,7 +102,7 @@ def search_session_details(session: Session, search_params: Dict[str, Any],limit
     results = session.exec(statement.order_by(SessionDetail.create_time.desc()).limit(limit)).all()
     return results
 
-def search_session_details_by_user_id(session: Session,user_id:str, search_params: Dict[str, Any],limit: int | None = None) -> Sequence[SessionDetail]:
+def search_session_details_by_user_id(session: Session, user_id:str, search_params=None, limit: int | None = None) -> Sequence[SessionDetail]:
     """
     根据提供的参数搜索会话详情，使用SessionDetail中定义的like_search_fields
     来决定查询方式
@@ -115,6 +115,8 @@ def search_session_details_by_user_id(session: Session,user_id:str, search_param
         符合条件的SessionDetail列表
         :param user_id:
     """
+    if search_params is None:
+        search_params = {}
     statement = select(SessionDetail).join(SessionPo,SessionPo.id == SessionDetail.session_id).where(SessionPo.user_id == user_id)
 
     # 获取SessionDetail类的所有字段名

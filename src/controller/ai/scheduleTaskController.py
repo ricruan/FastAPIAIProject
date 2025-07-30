@@ -123,9 +123,10 @@ async def batch_create_schedule_tasks(
     except Exception as e:
         return HttpResponse.error(msg=str(e))
 
-@router.get("/get/{task_id}", response_model=HttpResponseModel[AppScheduleTask])
+@router.get("/get", response_model=HttpResponseModel[AppScheduleTask])
 async def get_schedule_task(
-    task_id: str = Path(..., description="日程/任务ID"),
+    task_id: str = Query(..., description="日程/任务ID"),
+    user_id: str = Query(..., description="用户ID"),
     db: Session = Depends(get_db)
 ):
     """
@@ -133,6 +134,7 @@ async def get_schedule_task(
     
     Args:
         task_id: 日程/任务ID
+        user_id: 用户ID
         db: 数据库会话
         
     Returns:
@@ -141,6 +143,11 @@ async def get_schedule_task(
     task = appScheduleTaskDao.get_schedule_task_by_id(db, task_id)
     if not task:
         return HttpResponse.error(msg=f"日程/任务不存在: {task_id}")
+    
+    # 验证任务是否属于该用户
+    if task.user_id != user_id:
+        return HttpResponse.error(msg=f"无权访问此任务")
+        
     return HttpResponse.success(task)
 
 @router.put("/update/{task_id}", response_model=HttpResponseModel[AppScheduleTask])
@@ -273,33 +280,37 @@ async def get_user_schedule_tasks(
     tasks = appScheduleTaskDao.get_schedule_tasks_by_user_id(db, user_id)
     return HttpResponse.success(list(tasks))
 
-@router.get("/ending-soon/{hours}", response_model=HttpResponseModel[List[AppScheduleTask]])
+@router.get("/ending-soon", response_model=HttpResponseModel[List[AppScheduleTask]])
 async def get_ending_soon_tasks(
-    hours: int = Path(..., description="小时数", ge=1, le=24),
+    user_id: str = Query(..., description="用户ID"),
+    hours: int = Query(..., description="小时数", ge=1, le=24),
     db: Session = Depends(get_db)
 ):
     """
     获取即将结束的日程或任务（离结束时间只差N个小时）
     
     Args:
+        user_id: 用户ID
         hours: 小时数
         db: 数据库会话
         
     Returns:
-        即将结束的日程/任务列表
+        即将结束的日程/任务列表     
     """
-    tasks = appScheduleTaskDao.get_schedule_tasks_ending_soon(db, hours)
+    tasks = appScheduleTaskDao.get_schedule_tasks_ending_soon(session=db, hours=hours, user_id=user_id)
     return HttpResponse.success(list(tasks), msg=f"获取成功，共{len(tasks)}条即将在{hours}小时内结束的任务")
 
-@router.get("/today/ending-soon/{hours}", response_model=HttpResponseModel[List[AppScheduleTask]])
+@router.get("/today/ending-soon", response_model=HttpResponseModel[List[AppScheduleTask]])
 async def get_today_ending_soon_tasks(
-    hours: int = Path(..., description="小时数", ge=1, le=24),
+    user_id: str = Query(..., description="用户ID"),
+    hours: int = Query(..., description="小时数", ge=1, le=24),
     db: Session = Depends(get_db)
 ):
     """
     获取今天截止结束时间近N小时的数据
     
     Args:
+        user_id: 用户ID
         hours: 小时数
         db: 数据库会话
         
@@ -313,6 +324,9 @@ async def get_today_ending_soon_tasks(
     
     # 获取今天的所有任务
     today_tasks = appScheduleTaskDao.get_schedule_tasks_by_date_range(db, today_start, today_end)
+    # todo 筛选用户这段逻辑放进Dao层
+    # 筛选出特定用户的任务
+    today_tasks = [task for task in today_tasks if task.user_id == user_id]
     
     # 筛选出结束时间在N小时内的任务
     now = datetime.now()
@@ -350,56 +364,72 @@ async def mark_task_as_complete(
 
 @router.get("/overdue", response_model=HttpResponseModel)
 async def get_overdue_tasks(
+    user_id: str = Query(..., description="用户ID"),
     db: Session = Depends(get_db)
 ):
     """
     获取已过期但未完成的日程或任务
     
     Args:
+        user_id: 用户ID
         db: 数据库会话
         
     Returns:
         已过期但未完成的日程/任务列表
     """
+    # 获取所有过期任务
     tasks = appScheduleTaskDao.get_overdue_schedule_tasks(db)
+    # 筛选出特定用户的任务
+    tasks = [task for task in tasks if task.user_id == user_id]
     return HttpResponse.success(list(tasks), msg=f"获取成功，共{len(tasks)}条已过期但未完成的任务")
 
-@router.get("/upcoming/{days}", response_model=HttpResponseModel[List[AppScheduleTask]])
+@router.get("/upcoming", response_model=HttpResponseModel[List[AppScheduleTask]])
 async def get_upcoming_tasks(
-    days: int = Path(..., description="天数", ge=1, le=30),
+    user_id: str = Query(..., description="用户ID"),
+    days: int = Query(..., description="天数", ge=1, le=30),
     db: Session = Depends(get_db)
 ):
     """
     获取未来N天内的日程或任务
     
     Args:
+        user_id: 用户ID
         days: 天数
         db: 数据库会话
         
     Returns:
         未来N天内的日程/任务列表
     """
+    # 获取所有未来任务
     tasks = appScheduleTaskDao.get_upcoming_schedule_tasks(db, days)
+    # 筛选出特定用户的任务
+    tasks = [task for task in tasks if task.user_id == user_id]
     return HttpResponse.success(list(tasks), msg=f"获取成功，共{len(tasks)}条未来{days}天内的任务")
 
 @router.get("/important-urgent", response_model=HttpResponseModel[List[AppScheduleTask]])
 async def get_important_urgent_tasks(
+    user_id: str = Query(..., description="用户ID"),
     db: Session = Depends(get_db)
 ):
     """
     获取重要且紧急的任务
     
     Args:
+        user_id: 用户ID
         db: 数据库会话
         
     Returns:
         重要且紧急的任务列表
     """
+    # 获取所有重要且紧急的任务
     tasks = appScheduleTaskDao.get_important_urgent_tasks(db)
+    # 筛选出特定用户的任务
+    tasks = [task for task in tasks if task.user_id == user_id]
     return HttpResponse.success(list(tasks), msg=f"获取成功，共{len(tasks)}条重要且紧急的任务")
 
 @router.get("/by-importance-urgency", response_model=HttpResponseModel[List[AppScheduleTask]])
 async def get_tasks_by_importance_urgency(
+    user_id: str = Query(..., description="用户ID"),
     is_important: bool = Query(None, description="是否重要"),
     is_urgent: bool = Query(None, description="是否紧急"),
     db: Session = Depends(get_db)
@@ -408,6 +438,7 @@ async def get_tasks_by_importance_urgency(
     根据重要性和紧急性获取任务
     
     Args:
+        user_id: 用户ID
         is_important: 是否重要
         is_urgent: 是否紧急
         db: 数据库会话
@@ -415,9 +446,11 @@ async def get_tasks_by_importance_urgency(
     Returns:
         符合条件的任务列表
     """
-    # 如果两个参数都未提供，返回所有任务
+    # 如果两个参数都未提供，返回用户的所有任务
     if is_important is None and is_urgent is None:
         tasks = appScheduleTaskDao.get_all_schedule_tasks(db)
+        # 筛选出特定用户的任务
+        tasks = [task for task in tasks if task.user_id == user_id]
         return HttpResponse.success(list(tasks), msg="获取所有任务成功")
     
     # 如果只提供了一个参数，设置另一个为False
@@ -428,6 +461,9 @@ async def get_tasks_by_importance_urgency(
     
     # 调用DAO层根据重要性和紧急性获取任务
     tasks = appScheduleTaskDao.get_tasks_by_importance_urgency(db, is_important, is_urgent)
+    
+    # 筛选出特定用户的任务
+    tasks = [task for task in tasks if task.user_id == user_id]
     
     importance_str = "重要" if is_important else "不重要"
     urgency_str = "紧急" if is_urgent else "不紧急"

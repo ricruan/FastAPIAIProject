@@ -223,16 +223,18 @@ def get_schedule_tasks_by_date(session: Session, date: datetime) -> Sequence[App
     results = session.exec(statement).all()
     return results
 
-def get_schedule_tasks_ending_soon(session: Session, hours: int) -> Sequence[AppScheduleTask]:
+def get_schedule_tasks_ending_soon(session: Session,user_id: str, hours: int) -> Sequence[AppScheduleTask]:
     """
     获取即将结束的日程或任务（离开始时间只差N个小时）
 
     Args:
-        session: 数据库会话
-        hours: 小时数
+        :param session: 数据库会话
+        :param hours:  小时数
+        :param user_id:  用户ID
 
     Returns:
         日程/任务模型实例列表
+
     """
     # 计算当前时间和N小时后的时间
     now = datetime.now()
@@ -242,6 +244,7 @@ def get_schedule_tasks_ending_soon(session: Session, hours: int) -> Sequence[App
     # TaskStatus.INCOMPLETE 的值为 "0"，表示未完成状态
     statement = select(AppScheduleTask).where(
         and_(
+            AppScheduleTask.user_id == user_id,
             AppScheduleTask.end_time >= now,
             AppScheduleTask.start_time <= n_hours_later,
             AppScheduleTask.status == TaskStatus.INCOMPLETE  # "0"
