@@ -48,7 +48,7 @@ docker save -o stone-ai-0.1.10.tar stone-ai:0.1.10
 docker load -i stone-ai-0.1.10.tar
 
 
-docker run -p 8000:8000 --env-file .env -d --name stone-ai-0110 stone-ai:0.1.10
+docker run -p 8000:8000 --env-file .env -d -v ai_upload_volume:/app/uploads --name stone-ai-0110 stone-ai:0.1.10
 
 重载ng
 nginx -t
